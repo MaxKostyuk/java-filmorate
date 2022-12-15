@@ -47,12 +47,6 @@ public class UserController {
         log.info(message);
     }
 
-    @ExceptionHandler(ElementNotFoundException.class)
-    private ResponseEntity elementNotFoundHandler(ElementNotFoundException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getElement(),HttpStatus.NOT_FOUND);
-    }
-
     private int setNewId() {
         return ++idCounter;
     }

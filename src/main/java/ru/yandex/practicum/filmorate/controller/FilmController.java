@@ -48,10 +48,4 @@ public class FilmController {
     private int setNewId() {
         return ++idCounter;
     }
-
-    @ExceptionHandler(ElementNotFoundException.class)
-    private ResponseEntity elementNotFoundHandler(ElementNotFoundException e) {
-        log.warn(e.getMessage());
-        return new ResponseEntity<>(e.getElement(),HttpStatus.NOT_FOUND);
-    }
 }
