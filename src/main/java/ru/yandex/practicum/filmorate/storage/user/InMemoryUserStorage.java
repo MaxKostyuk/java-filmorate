@@ -15,15 +15,20 @@ public class InMemoryUserStorage implements UserStorage {
     private int idCounter = 0;
 
     @Override
-    public Collection<User> getAllUsers() {
-        return userMap.values();
-    }
-
-    @Override
     public User create(User user) {
         user.setId(getNextId());
         userMap.put(user.getId(), user);
         return user;
+    }
+
+    @Override
+    public Collection<User> getAll() {
+        return userMap.values();
+    }
+
+    @Override
+    public User getById(int id) {
+        return userMap.get(id);
     }
 
     @Override
