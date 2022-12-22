@@ -20,21 +20,24 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User createUser(User user) {
+    public User create(User user) {
         user.setId(getNextId());
-        if (user.getName() == null | user.getName().isBlank())
-            user.setName(user.getLogin());
         userMap.put(user.getId(), user);
         return user;
     }
 
     @Override
-    public User updateUser(User user) {
+    public User update(User user) {
         if (!userMap.containsKey(user.getId()))
             throw new ElementNotFoundException("User with id " + user.getId() + " not found", user);
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
         return user;
+    }
+
+    @Override
+    public void delete(int id) {
+        userMap.remove(id);
     }
 
     private int getNextId() {
