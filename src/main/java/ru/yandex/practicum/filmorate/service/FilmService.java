@@ -6,6 +6,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -19,10 +20,16 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
+        if (film.getLikesFromUsers() == null) {
+            film.setLikesFromUsers(new HashSet<>());
+        }
         return filmStorage.create(film);
     }
 
     public Film updateFilm(Film film) {
+        if (film.getLikesFromUsers() == null) {
+            film.setLikesFromUsers(new HashSet<>());
+        }
         return filmStorage.update(film);
     }
 
