@@ -1,51 +1,57 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Set;
 
-@Slf4j
 @RestController
 @RequestMapping("/users")
+@RequiredArgsConstructor
 public class UserController {
 
-    private final Map<Integer, User> userMap = new HashMap<>();
-    private int idCounter = 0;
+    private final UserService userService;
 
     @GetMapping
     private Collection<User> getAllUsers() {
-        return userMap.values();
+        return userService.getAllUsers();
     }
 
     @PostMapping
     private User createUser(@Valid @RequestBody User user) {
-        user.setId(setNewId());
-        putUserToMap(user, "User with id " + user.getId() + " was added");
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     private User updateUser(@Valid @RequestBody User user) {
-        if (!userMap.containsKey(user.getId()))
-            throw new ElementNotFoundException("User with id " + user.getId() + " not found", user);
-        putUserToMap(user, "User with id " + user.getId() + " was updated");
-        return user;
+        return userService.updateUser(user);
     }
 
-    private void putUserToMap(User user, String message) {
-        if (user.getName() == null | user.getName().isBlank())
-            user.setName(user.getLogin());
-        userMap.put(user.getId(), user);
-        log.info(message);
+    @GetMapping("/{id}/friends")
+    private Set<Integer> getUsersFriends(@PathVariable int id) {
+        return userService.getUsersFriends(id);
     }
 
-    private int setNewId() {
-        return ++idCounter;
+    @GetMapping("/{id}/friends/{otherId}")
+    private Set<Integer> getCommonFriends(@PathVariable int id,
+                                          @PathVariable int otherId) {
+        return userService.getCommonFriends(id, otherId);
+    }
+
+    @PutMapping("/{id}/friends/{friendId}")
+//    надо наверно установить код возврата
+    private void addToFriends(@PathVariable int id,
+                                 @PathVariable int friendId) {
+        userService.addToFriends(id, friendId);
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    private void deleteFromFriends(@PathVariable int id,
+                                 @PathVariable int friendId) {
+        userService.deleteFromFriends(id, friendId);
     }
 }
