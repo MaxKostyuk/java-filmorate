@@ -69,4 +69,8 @@ public class UserService {
         userStorage.update(user1);
         userStorage.update(user2);
     }
+
+    public User getById(int id) {
+        return userStorage.getById(id);
+    }
 }

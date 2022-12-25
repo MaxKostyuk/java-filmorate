@@ -31,6 +31,11 @@ public class UserController {
         return userService.updateUser(user);
     }
 
+    @GetMapping("/{id}")
+    private User getUserById(@PathVariable int id) {
+        return userService.getById(id);
+    }
+
     @GetMapping("/{id}/friends")
     private Set<Integer> getUsersFriends(@PathVariable int id) {
         return userService.getUsersFriends(id);
