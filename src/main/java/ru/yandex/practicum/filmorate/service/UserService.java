@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,17 +35,25 @@ public class UserService {
         return userStorage.update(user);
     }
 
-    public Set<Integer> getUsersFriends(int id) {
+    public Set<User> getUsersFriends(int id) {
         User user = userStorage.getById(id);
-        return user.getFriendsList();
+        Set<User> friendsList = new HashSet<>();
+        for (int friendsId : user.getFriendsList()) {
+            friendsList.add(userStorage.getById(friendsId));
+        }
+        return friendsList;
     }
 
-    public Set<Integer> getCommonFriends(int id, int otherId) {
+    public Set<User> getCommonFriends(int id, int otherId) {
         User user1 = userStorage.getById(id);
         User user2 = userStorage.getById(otherId);
-        Set<Integer> commonFriends = user1.getFriendsList().stream()
+        Set<Integer> commonFriendsIds = user1.getFriendsList().stream()
                 .filter(element -> user2.getFriendsList().contains(element))
                 .collect(Collectors.toSet());
+        Set<User> commonFriends = new HashSet<>();
+        for (int friendsId : commonFriendsIds) {
+            commonFriends.add(userStorage.getById(friendsId));
+        }
         return commonFriends;
     }
 
