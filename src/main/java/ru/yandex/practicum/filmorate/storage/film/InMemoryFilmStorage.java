@@ -1,12 +1,15 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class InMemoryFilmStorage  implements FilmStorage {
 
@@ -14,20 +17,37 @@ public class InMemoryFilmStorage  implements FilmStorage {
     private int idCounter = 0;
 
     @Override
-    public Collection<Film> getAllFilms() {
-        return filmMap.values();
-    }
-
-    @Override
-    public Film createFilm(Film film) {
+    public Film create(Film film) {
         film.setId(getNextId());
         filmMap.put(film.getId(), film);
+        log.info("Film with id " + film.getId() + " was added");
         return film;
     }
 
     @Override
-    public Film updateFilm(Film film) {
-        return null;
+    public Collection<Film> getAll() {
+        return filmMap.values();
+    }
+
+    @Override
+    public Film getById(int id) {
+        if (filmMap.containsKey(id))
+            return filmMap.get(id);
+        throw new ElementNotFoundException("Film with id " + id + " not found", id);
+    }
+
+    @Override
+    public Film update(Film film) {
+        if (!filmMap.containsKey(film.getId()))
+            throw new ElementNotFoundException("Film with id " + film.getId() + " not found", film);
+        filmMap.put(film.getId(), film);
+        log.info("Film with id " + film.getId() + " was updated");
+        return film;
+    }
+
+    @Override
+    public void delete(int id) {
+        filmMap.remove(id);
     }
 
     private int getNextId() {
