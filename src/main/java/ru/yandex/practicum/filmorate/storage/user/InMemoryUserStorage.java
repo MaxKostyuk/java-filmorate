@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -8,6 +9,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Component
 public class InMemoryUserStorage implements UserStorage {
 
@@ -18,6 +20,7 @@ public class InMemoryUserStorage implements UserStorage {
     public User create(User user) {
         user.setId(getNextId());
         userMap.put(user.getId(), user);
+        log.info("User with id " + user.getId() + " was added");
         return user;
     }
 
@@ -28,7 +31,9 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User getById(int id) {
-        return userMap.get(id);
+        if (userMap.containsKey(id))
+            return userMap.get(id);
+        throw new ElementNotFoundException("User with id " + id + " not found", id);
     }
 
     @Override
@@ -37,6 +42,8 @@ public class InMemoryUserStorage implements UserStorage {
             throw new ElementNotFoundException("User with id " + user.getId() + " not found", user);
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
+        userMap.put(user.getId(), user);
+        log.info("User with id " + user.getId() + " was updated");
         return user;
     }
 
