@@ -7,7 +7,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -37,7 +37,7 @@ public class UserService {
 
     public Set<User> getUsersFriends(int id) {
         User user = userStorage.getById(id);
-        Set<User> friendsList = new HashSet<>();
+        Set<User> friendsList = new LinkedHashSet<>();
         for (int friendsId : user.getFriendsList()) {
             friendsList.add(userStorage.getById(friendsId));
         }
@@ -50,7 +50,7 @@ public class UserService {
         Set<Integer> commonFriendsIds = user1.getFriendsList().stream()
                 .filter(element -> user2.getFriendsList().contains(element))
                 .collect(Collectors.toSet());
-        Set<User> commonFriends = new HashSet<>();
+        Set<User> commonFriends = new LinkedHashSet<>();
         for (int friendsId : commonFriendsIds) {
             commonFriends.add(userStorage.getById(friendsId));
         }
