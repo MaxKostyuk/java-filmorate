@@ -3,7 +3,9 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 public class FilmService {
 
     private final FilmStorage filmStorage;
+    private final UserStorage userStorage;
 
     public Collection<Film> getAllFilms() {
         return filmStorage.getAll();
@@ -34,15 +37,21 @@ public class FilmService {
     }
 
     public void addLikeToFilm(int id, int userId) {
-        Film film = filmStorage.getById(id);
-        film.getLikesFromUsers().add(userId);
-        filmStorage.update(film);
+        User user = userStorage.getById(userId);
+        if (user != null) {
+            Film film = filmStorage.getById(id);
+            film.getLikesFromUsers().add(userId);
+            filmStorage.update(film);
+        }
     }
 
     public void deleteLikeOfFilm(int id, int userId) {
-        Film film = filmStorage.getById(id);
-        film.getLikesFromUsers().remove(userId);
-        filmStorage.update(film);
+        User user = userStorage.getById(userId);
+        if (user != null) {
+            Film film = filmStorage.getById(id);
+            film.getLikesFromUsers().remove(userId);
+            filmStorage.update(film);
+        }
     }
 
     public Collection<Film> getMostPopular(int size) {
@@ -51,5 +60,9 @@ public class FilmService {
                 .sorted((f0,f1) -> f0.getLikesFromUsers().size() - f1.getLikesFromUsers().size())
                 .limit(size)
                 .collect(Collectors.toList());
+    }
+
+    public Film getFilmById(int id) {
+        return filmStorage.getById(id);
     }
 }
