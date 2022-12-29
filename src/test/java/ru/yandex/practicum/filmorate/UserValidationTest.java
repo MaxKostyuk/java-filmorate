@@ -21,7 +21,7 @@ public class UserValidationTest {
     String loginWithSpaces = "login incorrect";
     String correctLogin = "login";
     LocalDate incorrectBirthday = LocalDate.now().plusDays(1);
-    LocalDate correctBirthday = LocalDate.now().minusDays(1);
+    LocalDate correctBirthday = LocalDate.now();
     Set<Integer> validFriendsList = null;
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
