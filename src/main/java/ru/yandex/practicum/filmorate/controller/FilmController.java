@@ -2,11 +2,15 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import javax.validation.constraints.Positive;
 import java.util.Collection;
 
 @Slf4j
@@ -15,43 +19,50 @@ import java.util.Collection;
 @RequiredArgsConstructor
 public class FilmController {
 
-    private final FilmService filmService;
+    private final FilmService service;
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
-        return filmService.getAllFilms();
+    public Collection<Film> getAll() {
+        return service.getAllFilms();
     }
 
     @PostMapping
-    private Film createFilm(@Valid @RequestBody Film film) {
-        return filmService.createFilm(film);
+    private Film create(@Valid @RequestBody Film film) {
+        return service.createFilm(film);
     }
 
     @PutMapping
-    private Film updateFilm(@Valid @RequestBody Film film) {
-        return filmService.updateFilm(film);
+    private Film update(@Valid @RequestBody Film film) {
+        return service.updateFilm(film);
     }
 
     @GetMapping("/{id}")
-    private Film getFilmById(@PathVariable int id) {
-        return filmService.getFilmById(id);
+    private Film getById(@PathVariable int id) {
+        return service.getFilmById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    private void addLikeToFilm(@PathVariable int id,
-                               @PathVariable int userId) {
-        filmService.addLikeToFilm(id, userId);
+    private void addLike(@PathVariable int id,
+                         @PathVariable int userId) {
+        service.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    private void deleteLikeOfFilm(@PathVariable int id,
-                                  @PathVariable int userId) {
-        filmService.deleteLikeOfFilm(id, userId);
+    private void deleteLike(@PathVariable int id,
+                            @PathVariable int userId) {
+        service.deleteLikeOfFilm(id, userId);
     }
 
+
+    @Validated
     @GetMapping("/popular")
-    private Collection<Film> getMostPopular(@RequestParam(defaultValue = "10") String count) {
-        int intCount = Integer.parseInt(count);
-        return filmService.getMostPopular(intCount);
+    private Collection<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
+        return service.getMostPopular(count);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException e){
+        log.warn("Invalid argument " + e.getMessage());
+        return new ResponseEntity<>("Invalid argument " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
