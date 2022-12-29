@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -37,7 +38,8 @@ public class FilmService {
     }
 
     public void addLikeToFilm(int id, int userId) {
-        User user = userStorage.getById(userId);
+        User user = userStorage.getById(userId)
+                .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         if (user != null) {
             Film film = filmStorage.getById(id);
             film.getLikesFromUsers().add(userId);
@@ -46,7 +48,8 @@ public class FilmService {
     }
 
     public void deleteLikeOfFilm(int id, int userId) {
-        User user = userStorage.getById(userId);
+        User user = userStorage.getById(userId)
+                .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         if (user != null) {
             Film film = filmStorage.getById(id);
             film.getLikesFromUsers().remove(userId);

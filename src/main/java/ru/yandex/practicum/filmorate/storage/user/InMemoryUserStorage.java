@@ -21,7 +21,6 @@ public class InMemoryUserStorage implements UserStorage {
             user.setFriendsList(new HashSet<>());
         }
         userMap.put(user.getId(), user);
-        log.info("User with id " + user.getId() + " was added");
         return user;
     }
 
@@ -31,10 +30,8 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     @Override
-    public User getById(int id) {
-        if (userMap.containsKey(id))
-            return userMap.get(id);
-        throw new ElementNotFoundException("User with id " + id + " not found", id);
+    public Optional<User> getById(int id) {
+        return Optional.of(userMap.get(id));
     }
 
     @Override
@@ -47,7 +44,6 @@ public class InMemoryUserStorage implements UserStorage {
             user.setFriendsList(new HashSet<>());
         }
         userMap.put(user.getId(), user);
-        log.info("User with id " + user.getId() + " was updated");
         return user;
     }
 
