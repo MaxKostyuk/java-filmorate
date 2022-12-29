@@ -6,7 +6,7 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 @RestController
@@ -17,7 +17,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    private Collection<User> getAllUsers() {
+    private List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
@@ -48,7 +48,6 @@ public class UserController {
     }
 
     @PutMapping("/{id}/friends/{friendId}")
-//    надо наверно установить код возврата
     private void addToFriends(@PathVariable int id,
                                  @PathVariable int friendId) {
         userService.addToFriends(id, friendId);
