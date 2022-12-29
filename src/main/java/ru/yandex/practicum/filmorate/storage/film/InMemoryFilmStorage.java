@@ -5,8 +5,8 @@ import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Slf4j
@@ -25,8 +25,8 @@ public class InMemoryFilmStorage  implements FilmStorage {
     }
 
     @Override
-    public Collection<Film> getAll() {
-        return filmMap.values();
+    public List<Film> getAll() {
+        return List.copyOf(filmMap.values());
     }
 
     @Override

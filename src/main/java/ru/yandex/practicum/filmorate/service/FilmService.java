@@ -7,8 +7,8 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -18,7 +18,7 @@ public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
 
-    public Collection<Film> getAllFilms() {
+    public List<Film> getAllFilms() {
         return filmStorage.getAll();
     }
 
@@ -54,7 +54,7 @@ public class FilmService {
         }
     }
 
-    public Collection<Film> getMostPopular(int size) {
+    public List<Film> getMostPopular(int size) {
         return filmStorage.getAll()
                 .stream()
                 .sorted((f0,f1) -> f1.getLikesFromUsers().size() - f0.getLikesFromUsers().size())
