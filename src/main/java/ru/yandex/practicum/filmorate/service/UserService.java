@@ -31,9 +31,16 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+        if (user.getName() == null | user.getName().isBlank())
+            user.setName(user.getLogin());
+        User userToUpdate = getById(user.getId());
         validateName(user);
+        userToUpdate.setEmail(user.getEmail());
+        userToUpdate.setLogin(user.getLogin());
+        userToUpdate.setName(user.getName());
+        userToUpdate.setBirthday(user.getBirthday());
         log.info("User with id " + user.getId() + " was updated");
-        return userStorage.update(user);
+        return userStorage.update(userToUpdate);
     }
 
     public Set<User> getUsersFriends(int id) {
