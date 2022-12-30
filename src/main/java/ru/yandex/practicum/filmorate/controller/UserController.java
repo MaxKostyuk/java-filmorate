@@ -14,48 +14,48 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
+    private final UserService service;
 
     @GetMapping
     private List<User> getAllUsers() {
-        return userService.getAllUsers();
+        return service.getAllUsers();
     }
 
     @PostMapping
     private User createUser(@Valid @RequestBody User user) {
-        return userService.createUser(user);
+        return service.createUser(user);
     }
 
     @PutMapping
     private User updateUser(@Valid @RequestBody User user) {
-        return userService.updateUser(user);
+        return service.updateUser(user);
     }
 
     @GetMapping("/{id}")
     private User getUserById(@PathVariable int id) {
-        return userService.getById(id);
+        return service.getById(id);
     }
 
     @GetMapping("/{id}/friends")
     private Set<User> getUsersFriends(@PathVariable int id) {
-        return userService.getUsersFriends(id);
+        return service.getUsersFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     private Set<User> getCommonFriends(@PathVariable int id,
                                           @PathVariable int otherId) {
-        return userService.getCommonFriends(id, otherId);
+        return service.getCommonFriends(id, otherId);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
     private void addToFriends(@PathVariable int id,
                                  @PathVariable int friendId) {
-        userService.addToFriends(id, friendId);
+        service.addToFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}/friends/{friendId}")
     private void deleteFromFriends(@PathVariable int id,
                                  @PathVariable int friendId) {
-        userService.deleteFromFriends(id, friendId);
+        service.deleteFromFriends(id, friendId);
     }
 }

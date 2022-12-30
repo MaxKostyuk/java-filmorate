@@ -7,9 +7,7 @@ import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,12 +42,9 @@ public class UserService {
     }
 
     public Set<User> getUsersFriends(int id) {
-        User user = getById(id);
-        Set<User> friendsList = new LinkedHashSet<>();
-        for (int friendsId : user.getFriendsList()) {
-            friendsList.add(getById(friendsId));
-        }
-        return friendsList;
+        return getById(id).getFriendsList().stream()
+                .map(this::getById)
+                .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 
     public Set<User> getCommonFriends(int id, int otherId) {
