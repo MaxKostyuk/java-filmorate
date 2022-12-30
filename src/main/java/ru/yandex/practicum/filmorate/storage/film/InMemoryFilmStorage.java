@@ -32,7 +32,7 @@ public class InMemoryFilmStorage  implements FilmStorage {
 
     @Override
     public Optional<Film> getById(int id) {
-            return Optional.of(filmMap.get(id));
+            return Optional.ofNullable(filmMap.get(id));
     }
 
     @Override
