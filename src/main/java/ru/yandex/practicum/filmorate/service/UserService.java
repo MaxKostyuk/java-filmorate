@@ -38,7 +38,7 @@ public class UserService {
         userToUpdate.setName(user.getName());
         userToUpdate.setBirthday(user.getBirthday());
         log.info("User with id " + user.getId() + " was updated");
-        return userStorage.update(userToUpdate);
+        return userToUpdate;
     }
 
     public Set<User> getFriends(int id) {
@@ -59,23 +59,19 @@ public class UserService {
     public void addToFriends(int id, int friendId) {
         User user1 = getById(id);
         User user2 = getById(friendId);
-        Set<Integer> user1Friends = user1.getFriendsList();
-        Set<Integer> user2Friends = user2.getFriendsList();
-        user1Friends.add(friendId);
-        user2Friends.add(id);
-        userStorage.update(user1);
-        userStorage.update(user2);
+        user1.getFriendsList().add(friendId);
+        user2.getFriendsList().add(id);
+        log.info("User with id " + id + " was updated");
+        log.info("User with id " + friendId + " was updated");
     }
 
     public void deleteFromFriends(int id, int friendId) {
         User user1 = getById(id);
         User user2 = getById(friendId);
-        Set<Integer> user1Friends = user1.getFriendsList();
-        Set<Integer> user2Friends = user2.getFriendsList();
-        user1Friends.remove(friendId);
-        user2Friends.remove(friendId);
-        userStorage.update(user1);
-        userStorage.update(user2);
+        user1.getFriendsList().remove(friendId);
+        user2.getFriendsList().remove(id);
+        log.info("User with id " + id + " was updated");
+        log.info("User with id " + friendId + " was updated");
     }
 
     public User getById(int id) {
