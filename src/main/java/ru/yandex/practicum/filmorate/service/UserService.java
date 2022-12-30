@@ -17,18 +17,18 @@ public class UserService {
 
     private final UserStorage userStorage;
 
-    public List<User> getAllUsers() {
+    public List<User> getAll() {
         return userStorage.getAll();
     }
 
 
-    public User createUser(User user) {
+    public User create(User user) {
         validateName(user);
         log.info("User with id " + user.getId() + " was added");
         return userStorage.create(user);
     }
 
-    public User updateUser(User user) {
+    public User update(User user) {
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
         User userToUpdate = getById(user.getId());
@@ -41,7 +41,7 @@ public class UserService {
         return userStorage.update(userToUpdate);
     }
 
-    public Set<User> getUsersFriends(int id) {
+    public Set<User> getFriends(int id) {
         return getById(id).getFriendsList().stream()
                 .map(this::getById)
                 .collect(Collectors.toCollection(LinkedHashSet::new));

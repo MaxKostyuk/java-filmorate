@@ -17,28 +17,28 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
-    private List<User> getAllUsers() {
-        return service.getAllUsers();
+    private List<User> getAll() {
+        return service.getAll();
     }
 
     @PostMapping
-    private User createUser(@Valid @RequestBody User user) {
-        return service.createUser(user);
+    private User create(@Valid @RequestBody User user) {
+        return service.create(user);
     }
 
     @PutMapping
-    private User updateUser(@Valid @RequestBody User user) {
-        return service.updateUser(user);
+    private User update(@Valid @RequestBody User user) {
+        return service.update(user);
     }
 
     @GetMapping("/{id}")
-    private User getUserById(@PathVariable int id) {
+    private User getById(@PathVariable int id) {
         return service.getById(id);
     }
 
     @GetMapping("/{id}/friends")
-    private Set<User> getUsersFriends(@PathVariable int id) {
-        return service.getUsersFriends(id);
+    private Set<User> getFriends(@PathVariable int id) {
+        return service.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
