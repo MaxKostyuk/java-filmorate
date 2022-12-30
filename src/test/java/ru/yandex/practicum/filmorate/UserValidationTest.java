@@ -22,13 +22,12 @@ public class UserValidationTest {
     String correctLogin = "login";
     LocalDate incorrectBirthday = LocalDate.now().plusDays(1);
     LocalDate correctBirthday = LocalDate.now();
-    Set<Integer> validFriendsList = null;
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 
     @Test
     public void userValidation_whenNullEmail_returnConstraintViolation() {
-        User user = new User(correctId, nullEmail, correctLogin, correctBirthday, validFriendsList);
+        User user = new User(correctId, nullEmail, correctLogin, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -40,7 +39,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenBlankEmail_returnConstraintViolation() {
-        User user = new User(correctId, blankEmail, correctLogin, correctBirthday, validFriendsList);
+        User user = new User(correctId, blankEmail, correctLogin, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -52,7 +51,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenIncorrectEmail_returnConstraintViolation() {
-        User user = new User(correctId, incorrectEmail, correctLogin, correctBirthday, validFriendsList);
+        User user = new User(correctId, incorrectEmail, correctLogin, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -64,7 +63,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenBlankLogin_returnConstraintViolation() {
-        User user = new User(correctId, correctEmail, blankLogin, correctBirthday, validFriendsList);
+        User user = new User(correctId, correctEmail, blankLogin, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -76,7 +75,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenLoginWithSpaces_returnConstraintViolation() {
-        User user = new User(correctId, correctEmail, loginWithSpaces, correctBirthday, validFriendsList);
+        User user = new User(correctId, correctEmail, loginWithSpaces, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -88,7 +87,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenIncorrectBirthday_returnConstraintViolation() {
-        User user = new User(correctId, correctEmail, correctLogin, incorrectBirthday, validFriendsList);
+        User user = new User(correctId, correctEmail, correctLogin, incorrectBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         ConstraintViolation<User> violation = violations.stream().findFirst()
@@ -100,7 +99,7 @@ public class UserValidationTest {
 
     @Test
     public void userValidation_whenAllFieldsCorrect_returnNoConstraintViolation() {
-        User user = new User(correctId, correctEmail, correctLogin, correctBirthday, validFriendsList);
+        User user = new User(correctId, correctEmail, correctLogin, correctBirthday);
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
 
