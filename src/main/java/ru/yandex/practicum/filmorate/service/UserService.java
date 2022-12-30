@@ -55,14 +55,10 @@ public class UserService {
     public Set<User> getCommonFriends(int id, int otherId) {
         User user1 = getById(id);
         User user2 = getById(otherId);
-        Set<Integer> commonFriendsIds = user1.getFriendsList().stream()
+        return user1.getFriendsList().stream()
                 .filter(element -> user2.getFriendsList().contains(element))
+                .map(this::getById)
                 .collect(Collectors.toSet());
-        Set<User> commonFriends = new LinkedHashSet<>();
-        for (int friendsId : commonFriendsIds) {
-            commonFriends.add(getById(friendsId));
-        }
-        return commonFriends;
     }
 
     public void addToFriends(int id, int friendId) {
