@@ -40,32 +40,29 @@ public class FilmService {
     public void addLikeToFilm(int id, int userId) {
         User user = userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
-        if (user != null) {
-            Film film = filmStorage.getById(id);
+            Film film = getById(id);
             film.getLikesFromUsers().add(userId);
             filmStorage.update(film);
-        }
     }
 
     public void deleteLikeOfFilm(int id, int userId) {
         User user = userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
-        if (user != null) {
-            Film film = filmStorage.getById(id);
-            film.getLikesFromUsers().remove(userId);
-            filmStorage.update(film);
-        }
+        Film film = getById(id);
+        film.getLikesFromUsers().remove(userId);
+        filmStorage.update(film);
     }
 
     public List<Film> getMostPopular(int size) {
         return filmStorage.getAll()
                 .stream()
-                .sorted((f0,f1) -> f1.getLikesFromUsers().size() - f0.getLikesFromUsers().size())
+                .sorted((f0, f1) -> f1.getLikesFromUsers().size() - f0.getLikesFromUsers().size())
                 .limit(size)
                 .collect(Collectors.toList());
     }
 
-    public Film getFilmById(int id) {
-        return filmStorage.getById(id);
+    public Film getById(int id) {
+        return filmStorage.getById(id)
+                .orElseThrow(() -> new ElementNotFoundException("Film with id " + id + " not found", id));
     }
 }
