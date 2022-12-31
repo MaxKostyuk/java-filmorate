@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Component
-public class InMemoryFilmStorage  implements FilmStorage {
+public class InMemoryFilmStorage implements FilmStorage {
 
     private final Map<Integer, Film> filmMap = new HashMap<>();
     private int idCounter = 0;
@@ -28,7 +28,7 @@ public class InMemoryFilmStorage  implements FilmStorage {
 
     @Override
     public Optional<Film> getById(int id) {
-            return Optional.ofNullable(filmMap.get(id));
+        return Optional.ofNullable(filmMap.get(id));
     }
 
     @Override

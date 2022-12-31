@@ -25,7 +25,7 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        log.info("Film with id " + film.getId() + " was added");
+        log.info("Film with id {} was added", film.getId());
         return filmStorage.create(film);
     }
 
@@ -35,7 +35,7 @@ public class FilmService {
         filmToUpdate.setDescription(film.getDescription());
         filmToUpdate.setReleaseDate(film.getReleaseDate());
         filmToUpdate.setDuration(film.getDuration());
-        log.info("Film with id " + film.getId() + " was updated");
+        log.info("Film with id {} was updated", film.getId());
         return filmToUpdate;
     }
 
@@ -44,7 +44,7 @@ public class FilmService {
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         Film film = getById(id);
         film.getLikesFromUsers().add(userId);
-        log.info("Film with id " + film.getId() + " was updated");
+        log.info("Film with id {} was updated", film.getId());
     }
 
     public void deleteLikeOfFilm(int id, int userId) {
@@ -52,7 +52,7 @@ public class FilmService {
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         Film film = getById(id);
         film.getLikesFromUsers().remove(userId);
-        log.info("Film with id " + film.getId() + " was updated");
+        log.info("Film with id {} was updated", film.getId());
     }
 
     public List<Film> getMostPopular(int size) {

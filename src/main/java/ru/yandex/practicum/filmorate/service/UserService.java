@@ -24,20 +24,19 @@ public class UserService {
 
     public User create(User user) {
         validateName(user);
-        log.info("User with id " + user.getId() + " was added");
+        log.info("User with id {} was added", user.getId());
         return userStorage.create(user);
     }
 
     public User update(User user) {
-        if (user.getName() == null | user.getName().isBlank())
-            user.setName(user.getLogin());
+        validateName(user);
         User userToUpdate = getById(user.getId());
         validateName(user);
         userToUpdate.setEmail(user.getEmail());
         userToUpdate.setLogin(user.getLogin());
         userToUpdate.setName(user.getName());
         userToUpdate.setBirthday(user.getBirthday());
-        log.info("User with id " + user.getId() + " was updated");
+        log.info("User with id {} was updated", user.getId());
         return userToUpdate;
     }
 
@@ -61,8 +60,8 @@ public class UserService {
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
         user2.getFriendsList().add(id);
-        log.info("User with id " + id + " was updated");
-        log.info("User with id " + friendId + " was updated");
+        log.info("User with id {} was updated", id);
+        log.info("User with id {} was updated", friendId);
     }
 
     public void deleteFromFriends(int id, int friendId) {
@@ -70,8 +69,8 @@ public class UserService {
         User user2 = getById(friendId);
         user1.getFriendsList().remove(friendId);
         user2.getFriendsList().remove(id);
-        log.info("User with id " + id + " was updated");
-        log.info("User with id " + friendId + " was updated");
+        log.info("User with id {} was updated", id);
+        log.info("User with id {} was updated", friendId);
     }
 
     public User getById(int id) {

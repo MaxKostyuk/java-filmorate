@@ -14,6 +14,7 @@ import javax.validation.constraints.Positive;
 import java.util.List;
 
 @Slf4j
+@Validated
 @RestController
 @RequestMapping("films")
 @RequiredArgsConstructor
@@ -54,7 +55,6 @@ public class FilmController {
     }
 
 
-    @Validated
     @GetMapping("/popular")
     private List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return service.getMostPopular(count);
@@ -62,7 +62,7 @@ public class FilmController {
 
     @ExceptionHandler
     public ResponseEntity<String> illegalArgumentExceptionHandler(IllegalArgumentException e){
-        log.warn("Invalid argument " + e.getMessage());
+        log.warn("Invalid argument {}", e.getMessage());
         return new ResponseEntity<>("Invalid argument " + e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }
