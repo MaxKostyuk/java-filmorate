@@ -31,7 +31,6 @@ public class UserService {
     public User update(User user) {
         validateName(user);
         User userToUpdate = getById(user.getId());
-        validateName(user);
         userToUpdate.setEmail(user.getEmail());
         userToUpdate.setLogin(user.getLogin());
         userToUpdate.setName(user.getName());

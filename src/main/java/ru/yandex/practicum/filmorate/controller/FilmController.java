@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -14,6 +15,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequestMapping("films")
+@Validated
 @RequiredArgsConstructor
 public class FilmController {
 
@@ -51,8 +53,6 @@ public class FilmController {
         service.deleteLikeOfFilm(id, userId);
     }
 
-
-    @Validated
     @GetMapping("/popular")
     private List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return service.getMostPopular(count);
