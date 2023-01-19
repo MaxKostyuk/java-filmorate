@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -27,34 +26,34 @@ public class FilmController {
     }
 
     @PostMapping
-    private Film create(@Valid @RequestBody Film film) {
+    public Film create(@Valid @RequestBody Film film) {
         return service.createFilm(film);
     }
 
     @PutMapping
-    private Film update(@Valid @RequestBody Film film) {
+    public Film update(@Valid @RequestBody Film film) {
         return service.updateFilm(film);
     }
 
     @GetMapping("/{id}")
-    private Film getById(@PathVariable int id) {
+    public Film getById(@PathVariable int id) {
         return service.getById(id);
     }
 
     @PutMapping("/{id}/like/{userId}")
-    private void addLike(@PathVariable int id,
+    public void addLike(@PathVariable int id,
                          @PathVariable int userId) {
         service.addLikeToFilm(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    private void deleteLike(@PathVariable int id,
+    public void deleteLike(@PathVariable int id,
                             @PathVariable int userId) {
         service.deleteLikeOfFilm(id, userId);
     }
 
     @GetMapping("/popular")
-    private List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
+    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return service.getMostPopular(count);
     }
 }
