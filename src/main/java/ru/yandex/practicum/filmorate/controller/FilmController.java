@@ -1,49 +1,59 @@
 package ru.yandex.practicum.filmorate.controller;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import javax.validation.constraints.Positive;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("films")
+@Validated
+@RequiredArgsConstructor
 public class FilmController {
 
-    private final Map<Integer, Film> filmMap = new HashMap<>();
-    private int idCounter = 0;
+    private final FilmService service;
 
     @GetMapping
-    public Collection<Film> getAllFilms() {
-        return filmMap.values();
+    public List<Film> getAll() {
+        return service.getAllFilms();
     }
 
     @PostMapping
-    private Film createFilm(@Valid @RequestBody Film film) {
-        film.setId(setNewId());
-        putFilmToMap(film, "Film with id " + film.getId() + " was added");
-        return film;
+    public Film create(@Valid @RequestBody Film film) {
+        return service.createFilm(film);
     }
 
     @PutMapping
-    private Film updateFilm(@Valid @RequestBody Film film) {
-        if (!filmMap.containsKey(film.getId()))
-            throw new ElementNotFoundException("Film with id " + film.getId() + " not found", film);
-        putFilmToMap(film, "Film with id " + film.getId() + " was updated");
-        return film;
+    public Film update(@Valid @RequestBody Film film) {
+        return service.updateFilm(film);
     }
 
-    private void putFilmToMap(Film film, String message) {
-        filmMap.put(film.getId(), film);
-        log.info(message);
+    @GetMapping("/{id}")
+    public Film getById(@PathVariable int id) {
+        return service.getById(id);
     }
 
-    private int setNewId() {
-        return ++idCounter;
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable int id,
+                         @PathVariable int userId) {
+        service.addLikeToFilm(id, userId);
+    }
+
+    @DeleteMapping("/{id}/like/{userId}")
+    public void deleteLike(@PathVariable int id,
+                            @PathVariable int userId) {
+        service.deleteLikeOfFilm(id, userId);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
+        return service.getMostPopular(count);
     }
 }
