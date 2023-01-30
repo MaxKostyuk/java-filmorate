@@ -6,6 +6,7 @@ import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateValidation;
 
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
@@ -26,13 +27,18 @@ public class Film {
     private int duration;
     @JsonIgnore
     private Set<Integer> likesFromUsers;
+    @NotNull
+    private Rating rating;
+    private Set<Genre> filmGenres;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating rating) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.likesFromUsers = new HashSet<>();
+        this.rating = rating;
+        this.filmGenres = new HashSet<>();
     }
 }
