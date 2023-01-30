@@ -25,8 +25,9 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
-        log.info("Film with id {} was added", film.getId());
-        return filmStorage.create(film);
+        Film createdFilm = filmStorage.create(film);
+        log.info("Film with id {} was added", createdFilm.getId());
+        return createdFilm;
     }
 
     public Film updateFilm(Film film) {

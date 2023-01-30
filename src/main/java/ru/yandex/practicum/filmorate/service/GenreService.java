@@ -27,7 +27,8 @@ public class GenreService {
     }
 
     public Genre create(Genre genre) {
-        log.info("Genre with id {} was added", genre.getId());
-        return genreStorage.create(genre);
+        Genre createdGenre = genreStorage.create(genre);
+        log.info("Genre with id {} was added", createdGenre.getId());
+        return createdGenre;
     }
 }

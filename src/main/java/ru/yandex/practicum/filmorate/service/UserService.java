@@ -24,8 +24,9 @@ public class UserService {
 
     public User create(User user) {
         validateName(user);
-        log.info("User with id {} was added", user.getId());
-        return userStorage.create(user);
+        User createdUser = userStorage.create(user);
+        log.info("User with id {} was added", createdUser.getId());
+        return createdUser;
     }
 
     public User update(User user) {

@@ -27,7 +27,8 @@ public class RatingService {
     }
 
     public Rating create(Rating rating) {
-        log.info("Rating with id {} was added", rating.getId());
-        return ratingStorage.create(rating);
+        Rating createdRating = ratingStorage.create(rating);
+        log.info("Rating with id {} was added", createdRating.getId());
+        return createdRating;
     }
 }
