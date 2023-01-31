@@ -29,7 +29,7 @@ public class Film {
     private Set<Integer> likesFromUsers;
     @NotNull
     private Rating mpa;
-    private Set<Genre> filmGenres;
+    private Set<Genre> genres;
 
     public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
         this.id = id;
@@ -39,6 +39,6 @@ public class Film {
         this.duration = duration;
         this.likesFromUsers = new HashSet<>();
         this.mpa = mpa;
-        this.filmGenres = new HashSet<>();
+        this.genres = new HashSet<>();
     }
 }

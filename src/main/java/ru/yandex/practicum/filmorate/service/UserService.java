@@ -59,18 +59,14 @@ public class UserService {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
-        user2.getFriendsList().add(id);
         log.info("User with id {} was updated", id);
-        log.info("User with id {} was updated", friendId);
     }
 
     public void deleteFromFriends(int id, int friendId) {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().remove(friendId);
-        user2.getFriendsList().remove(id);
         log.info("User with id {} was updated", id);
-        log.info("User with id {} was updated", friendId);
     }
 
     public User getById(int id) {
