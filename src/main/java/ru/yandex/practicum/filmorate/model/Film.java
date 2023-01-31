@@ -28,17 +28,17 @@ public class Film {
     @JsonIgnore
     private Set<Integer> likesFromUsers;
     @NotNull
-    private Rating rating;
+    private Rating mpa;
     private Set<Genre> filmGenres;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating rating) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
         this.likesFromUsers = new HashSet<>();
-        this.rating = rating;
+        this.mpa = mpa;
         this.filmGenres = new HashSet<>();
     }
 }
