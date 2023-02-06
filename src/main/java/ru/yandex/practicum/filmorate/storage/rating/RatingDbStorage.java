@@ -37,7 +37,7 @@ public class RatingDbStorage implements RatingStorage {
 
     @Override
     public List<Rating> getAll() {
-        return jdbcTemplate.query("SELECT * FROM rating", new RatingMapper());
+        return jdbcTemplate.query("SELECT * FROM rating ORDER BY RATING_ID ASC", new RatingMapper());
     }
 
     @Override
