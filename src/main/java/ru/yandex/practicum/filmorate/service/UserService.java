@@ -36,6 +36,7 @@ public class UserService {
         userToUpdate.setLogin(user.getLogin());
         userToUpdate.setName(user.getName());
         userToUpdate.setBirthday(user.getBirthday());
+        userStorage.update(user);
         log.info("User with id {} was updated", user.getId());
         return userToUpdate;
     }
@@ -59,6 +60,7 @@ public class UserService {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
+        userStorage.update(user1);
         log.info("User with id {} was updated", id);
     }
 
@@ -66,6 +68,7 @@ public class UserService {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().remove(friendId);
+        userStorage.update(user1);
         log.info("User with id {} was updated", id);
     }
 
