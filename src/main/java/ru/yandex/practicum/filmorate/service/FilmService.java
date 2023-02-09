@@ -47,6 +47,7 @@ public class FilmService {
         filmToUpdate.setDuration(film.getDuration());
         filmToUpdate.setMpa(film.getMpa());
         filmToUpdate.setGenres(film.getGenres());
+        filmStorage.update(filmToUpdate);
         log.info("Film with id {} was updated", film.getId());
         return filmToUpdate;
     }
@@ -56,6 +57,7 @@ public class FilmService {
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         Film film = getById(id);
         film.getLikesFromUsers().add(userId);
+        filmStorage.update(film);
         log.info("Film with id {} was updated", film.getId());
     }
 
@@ -64,6 +66,7 @@ public class FilmService {
                 .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
         Film film = getById(id);
         film.getLikesFromUsers().remove(userId);
+        filmStorage.update(film);
         log.info("Film with id {} was updated", film.getId());
     }
 

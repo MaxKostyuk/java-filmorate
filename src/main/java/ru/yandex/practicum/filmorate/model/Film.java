@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.yandex.practicum.filmorate.validation.ReleaseDateValidation;
 
 import javax.validation.constraints.NotBlank;
@@ -14,6 +15,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
+@NoArgsConstructor
 public class Film {
 
     private int id;
@@ -31,7 +33,7 @@ public class Film {
     private Rating mpa;
     private Set<Genre> genres;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa, Set<Genre> genres) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -39,6 +41,9 @@ public class Film {
         this.duration = duration;
         this.likesFromUsers = new HashSet<>();
         this.mpa = mpa;
-        this.genres = new HashSet<>();
+        if (genres != null)
+            this.genres = genres;
+        else
+            this.genres = new HashSet<>();
     }
 }
