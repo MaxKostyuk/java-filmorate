@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -11,14 +12,9 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
 
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -101,11 +97,37 @@ public class FilmDbStorage implements FilmStorage {
         genresToAdd.removeAll(oldGenresList);
         Set<Genre> genresToDelete = new HashSet<>(oldGenresList);
         genresToDelete.removeAll(newGenresList);
-        for (Genre genre : genresToDelete) {
-            jdbcTemplate.update("DELETE FROM FILM_GENRES WHERE GENRE_ID = ? AND FILM_ID = ?", genre.getId(), film.getId());
+        ArrayList<Genre> genresToDeleteAsList = new ArrayList<>(genresToDelete);
+        if (!genresToDeleteAsList.isEmpty()) {
+            String deleteSql = "DELETE FROM FILM_GENRES WHERE GENRE_ID = ? AND FILM_ID = ?";
+            jdbcTemplate.batchUpdate(deleteSql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, genresToDeleteAsList.get(i).getId());
+                    ps.setInt(2, film.getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return genresToDeleteAsList.size();
+                }
+            });
         }
-        for (Genre genre : genresToAdd) {
-            jdbcTemplate.update("INSERT INTO FILM_GENRES (FILM_ID, GENRE_ID) VALUES (?, ?)", film.getId(), genre.getId());
+        ArrayList<Genre> genresToAddAsList = new ArrayList<>(genresToAdd);
+        if (!genresToAddAsList.isEmpty()) {
+            String addSql = "INSERT INTO FILM_GENRES (FILM_ID, GENRE_ID) VALUES (?, ?)";
+            jdbcTemplate.batchUpdate(addSql, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, film.getId());
+                    ps.setInt(2, genresToAddAsList.get(i).getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return genresToAddAsList.size();
+                }
+            });
         }
     }
 
@@ -116,11 +138,35 @@ public class FilmDbStorage implements FilmStorage {
         likesToAdd.removeAll(oldLikesList);
         Set<Integer> likesToDelete = new HashSet<>(oldLikesList);
         likesToDelete.removeAll(newLikesList);
-        for (int i : likesToDelete) {
-            jdbcTemplate.update("DELETE FROM FILM_LIKES WHERE USER_ID = ? AND FILM_ID = ?", i, film.getId());
+        ArrayList<Integer> likesToDeleteAsList = new ArrayList<>(likesToDelete);
+        if(!likesToDeleteAsList.isEmpty()) {
+            jdbcTemplate.batchUpdate("DELETE FROM FILM_LIKES WHERE USER_ID = ? AND FILM_ID = ?", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, likesToDeleteAsList.get(i));
+                    ps.setInt(2, film.getId());
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return likesToDeleteAsList.size();
+                }
+            });
         }
-        for (int i : likesToAdd) {
-            jdbcTemplate.update("INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", film.getId(), i);
+        ArrayList<Integer> likesToAddAsList = new ArrayList<>(likesToAdd);
+        if(!likesToAddAsList.isEmpty()) {
+            jdbcTemplate.batchUpdate("INSERT INTO FILM_LIKES (FILM_ID, USER_ID) VALUES (?, ?)", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, film.getId());
+                    ps.setInt(2, likesToAddAsList.get(i));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return likesToAddAsList.size();
+                }
+            });
         }
     }
 

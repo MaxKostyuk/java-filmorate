@@ -2,6 +2,8 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.relational.core.sql.In;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -84,11 +86,36 @@ public class UserDbStorage implements UserStorage {
         friendsToAdd.removeAll(oldFriendsList);
         Set<Integer> friendsToDelete = new HashSet<>(oldFriendsList);
         friendsToDelete.removeAll(newFriendsList);
-        for (int i : friendsToDelete) {
-            jdbcTemplate.update("DELETE FROM FRIENDS_LIST WHERE SENDER_ID = ? AND ACCEPTER_ID = ?", user.getId(), i);
+        ArrayList<Integer> friendsToDeleteAsList = new ArrayList<>(friendsToDelete);
+        if(!friendsToDeleteAsList.isEmpty()) {
+            jdbcTemplate.batchUpdate("DELETE FROM FRIENDS_LIST WHERE SENDER_ID = ? AND ACCEPTER_ID = ?", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, user.getId());
+                    ps.setInt(2, friendsToDeleteAsList.get(i));
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return friendsToDeleteAsList.size();
+                }
+            });
         }
-        for (int i : friendsToAdd) {
-            jdbcTemplate.update("INSERT INTO FRIENDS_LIST (SENDER_ID, ACCEPTER_ID, STATUS_ID) VALUES (?,?,?)", user.getId(), i, 1);
+        ArrayList<Integer> friendsToAddAsList = new ArrayList<>(friendsToAdd);
+        if(!friendsToAddAsList.isEmpty()) {
+            jdbcTemplate.batchUpdate("INSERT INTO FRIENDS_LIST (SENDER_ID, ACCEPTER_ID, STATUS_ID) VALUES (?,?,?)", new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    ps.setInt(1, user.getId());
+                    ps.setInt(2, friendsToAddAsList.get(i));
+                    ps.setInt(3, 1);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return friendsToAddAsList.size();
+                }
+            });
         }
     }
 
