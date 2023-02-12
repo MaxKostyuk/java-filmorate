@@ -24,8 +24,9 @@ public class UserService {
 
     public User create(User user) {
         validateName(user);
-        log.info("User with id {} was added", user.getId());
-        return userStorage.create(user);
+        User createdUser = userStorage.create(user);
+        log.info("User with id {} was added", createdUser.getId());
+        return createdUser;
     }
 
     public User update(User user) {
@@ -35,6 +36,7 @@ public class UserService {
         userToUpdate.setLogin(user.getLogin());
         userToUpdate.setName(user.getName());
         userToUpdate.setBirthday(user.getBirthday());
+        userStorage.update(user);
         log.info("User with id {} was updated", user.getId());
         return userToUpdate;
     }
@@ -58,18 +60,16 @@ public class UserService {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
-        user2.getFriendsList().add(id);
+        userStorage.update(user1);
         log.info("User with id {} was updated", id);
-        log.info("User with id {} was updated", friendId);
     }
 
     public void deleteFromFriends(int id, int friendId) {
         User user1 = getById(id);
         User user2 = getById(friendId);
         user1.getFriendsList().remove(friendId);
-        user2.getFriendsList().remove(id);
+        userStorage.update(user1);
         log.info("User with id {} was updated", id);
-        log.info("User with id {} was updated", friendId);
     }
 
     public User getById(int id) {
