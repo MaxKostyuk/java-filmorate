@@ -3,10 +3,13 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
@@ -103,5 +106,9 @@ public class FilmService {
                             .sorted(Comparator.comparingInt(Genre::getId))
                             .collect(Collectors.toCollection(LinkedHashSet::new)));
         }
+    }
+
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        return ((FilmDbStorage) filmStorage).getCommonFilms(userId, friendId);
     }
 }
