@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -209,4 +210,33 @@ public class FilmDbStorage implements FilmStorage {
             return rs.getInt("user_id");
         }
     }
+
+    @Override
+    //TODO: Заменить getDescription на getDirector когда поле появится
+    public List<Film> searchFilms(String query, SearchBy type) {
+        String sql;
+        List<Film> result = new ArrayList<>();
+        switch (type) {
+            case BOTH:
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name LIKE '%"+query+"%' UNION " +
+                        "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description LIKE '%"+query+"%'";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                break;
+            case TITLE:
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name LIKE '%"+query+"%'";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                break;
+            case DIRECTOR:
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description LIKE '%"+query+"%'";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                break;
+        }
+        for (Film film : result) {
+            film.setGenres(getGenres(film));
+            film.setLikesFromUsers(getLikes(film));
+        }
+        System.out.println(result);
+        return result;
+    }
+
 }

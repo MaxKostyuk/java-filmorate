@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
+import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.List;
@@ -15,4 +16,6 @@ public interface FilmStorage {
     Film update(Film film);
 
     void delete(int id);
+
+    List<Film> searchFilms(String query, SearchBy type);
 }

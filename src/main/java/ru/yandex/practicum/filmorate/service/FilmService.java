@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -103,5 +104,20 @@ public class FilmService {
                             .sorted(Comparator.comparingInt(Genre::getId))
                             .collect(Collectors.toCollection(LinkedHashSet::new)));
         }
+    }
+
+    public List<Film> searchFilms(String query, List<String> by) {
+        if (by.isEmpty()){
+            throw new IllegalArgumentException("Поля для поиска не заданы. Поиск возможен только по названию и/или режиссёру.");
+        }
+        if (by.contains("director") && by.contains("title")) {
+            return filmStorage.searchFilms(query, SearchBy.BOTH);
+        } else if (by.contains("title")) {
+            return filmStorage.searchFilms(query, SearchBy.TITLE);
+        } else if (by.contains("director")) {
+            return filmStorage.searchFilms(query, SearchBy.DIRECTOR);
+        }
+        System.out.println("ничего");
+        throw new IllegalArgumentException("Поиск возможен только по названию и/или режиссёру.");
     }
 }
