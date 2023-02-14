@@ -218,16 +218,16 @@ public class FilmDbStorage implements FilmStorage {
         List<Film> result = new ArrayList<>();
         switch (type) {
             case BOTH:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name LIKE '%"+query+"%' UNION " +
-                        "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description LIKE '%"+query+"%'";
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name ILIKE '%"+query+"%' " +
+                        "OR description LIKE '%"+query+"%'";
                 result = jdbcTemplate.query(sql, new FilmMapper());
                 break;
             case TITLE:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name LIKE '%"+query+"%'";
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name ILIKE '%"+query+"%'";
                 result = jdbcTemplate.query(sql, new FilmMapper());
                 break;
             case DIRECTOR:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description LIKE '%"+query+"%'";
+                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description ILIKE '%"+query+"%'";
                 result = jdbcTemplate.query(sql, new FilmMapper());
                 break;
         }
