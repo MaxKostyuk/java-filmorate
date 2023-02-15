@@ -32,8 +32,9 @@ public class Film {
     @NotNull
     private Rating mpa;
     private Set<Genre> genres;
+    private Set<Director> directors;
 
-    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa, Set<Genre> genres) {
+    public Film(int id, String name, String description, LocalDate releaseDate, int duration, Rating mpa, Set<Genre> genres, Set<Director> directors) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -45,5 +46,6 @@ public class Film {
             this.genres = genres;
         else
             this.genres = new HashSet<>();
+        this.directors = directors;
     }
 }
