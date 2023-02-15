@@ -13,6 +13,7 @@ import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -111,4 +112,5 @@ public class FilmService {
     public List<Film> getCommonFilms(int userId, int friendId) {
         return ((FilmDbStorage) filmStorage).getCommonFilms(userId, friendId);
     }
+
 }
