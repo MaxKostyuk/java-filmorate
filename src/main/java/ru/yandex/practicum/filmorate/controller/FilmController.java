@@ -56,4 +56,10 @@ public class FilmController {
     public List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return service.getMostPopular(count);
     }
+
+    //Метод удаления фильма по ИД
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable int id) {
+        service.deleteById(id);
+    }
 }

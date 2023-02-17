@@ -81,4 +81,8 @@ public class UserService {
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
     }
+
+    public void deleteById(int id) {
+        userStorage.delete(id);
+    }
 }
