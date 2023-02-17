@@ -1,12 +1,82 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
+import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
+import java.util.List;
+
+@Slf4j
 @RequiredArgsConstructor
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
+    private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
 
+    public Review add(Review review) {
+        validateUserId(review.getUserId());
+        validateFilmId(review.getFilmId());
+        Review createdReview = reviewStorage.create(review);
+        log.info("Review with id {} was added", createdReview.getReviewId());
+        return createdReview;
+    }
+
+
+    public Review update(Review review) {
+        validateUserId(review.getUserId());
+        validateFilmId(review.getFilmId());
+        validateReviewId(review.getReviewId());
+        Review updatedReview = reviewStorage.update(review);
+        log.info("Review with id {} was updated", updatedReview.getReviewId());
+        return updatedReview;
+    }
+
+
+    public void delete(int id) {
+        reviewStorage.delete(id);
+    }
+
+
+    public Review getById(int id) {
+        return reviewStorage.getById(id).orElseThrow(
+                () -> new ElementNotFoundException("Review with id " + id + " not found", id));
+    }
+
+
+    public List<Review> getByFilmId(int filmId, int count) {
+        return reviewStorage.getByFilmId(filmId, count);
+    }
+
+
+
+    private void validateFilmId(int id) {
+        filmStorage.getById(id)
+                .orElseThrow(() -> new ElementNotFoundException("Film with id " + id + " not found", id));
+    }
+
+    private void validateUserId(int id) {
+        userStorage.getById(id)
+                .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
+    }
+
+    private void validateReviewId(int id) {
+        reviewStorage.getById(id)
+                .orElseThrow(() -> new ElementNotFoundException("Review with id " + id + " not found", id));
+    }
+
+    public void addLike(int reviewId, int userId, boolean isLike) {
+        validateReviewId(reviewId);
+        validateUserId(userId);
+        reviewStorage.addLike(reviewId, userId, isLike);
+    }
+
+    public void deleteLike(int reviewId, int userId, boolean isLike) {
+        reviewStorage.deleteLike(reviewId, userId, isLike);
+    }
 }
