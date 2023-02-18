@@ -41,14 +41,13 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
-    //TODO: Заменить getDescription на getDirector когда поле появится
     public List<Film> searchFilms(String query, SearchBy type) {
         List<Film> result = new ArrayList<>();
         switch (type) {
             case BOTH:
                 for (int i = 0; i < filmMap.size(); i++) {
                     if (filmMap.get(i).getName().contains(query) ||
-                            filmMap.get(i).getDescription().contains(query)) {
+                            filmMap.get(i).getDirectors().contains(query)) {
                         result.add(filmMap.get(i));
                     }
                 }
@@ -62,7 +61,7 @@ public class InMemoryFilmStorage implements FilmStorage {
                 break;
             case DIRECTOR:
                 for (int i = 0; i < filmMap.size(); i++) {
-                    if (filmMap.get(i).getDescription().contains(query)) {
+                    if (filmMap.get(i).getDirectors().contains(query)) {
                         result.add(filmMap.get(i));
                     }
                 }
