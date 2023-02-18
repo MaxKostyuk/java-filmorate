@@ -1,21 +1,24 @@
 package ru.yandex.practicum.filmorate.model;
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
+import javax.validation.constraints.NotNull;
 
 @Data
+@NoArgsConstructor
 public class Review {
 
     private int reviewId;
     @NotBlank
     private String content;
-    private boolean isPositive;
-    @Positive
-    private int userId;
-    @Positive
-    private int filmId;
+    @NotNull
+    private Boolean isPositive;
+    @NotNull
+    private Integer userId;
+    @NotNull
+    private Integer filmId;
     private int useful;
 
     public boolean getIsPositive() {

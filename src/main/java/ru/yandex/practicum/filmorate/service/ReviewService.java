@@ -52,7 +52,10 @@ public class ReviewService {
 
 
     public List<Review> getByFilmId(int filmId, int count) {
-        return reviewStorage.getByFilmId(filmId, count);
+        if(filmId != 0)
+            return reviewStorage.getByFilmId(filmId, count);
+        else
+            return reviewStorage.getAllReviews(count);
     }
 
 

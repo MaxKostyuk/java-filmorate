@@ -57,13 +57,27 @@ public class ReviewDbStorage implements ReviewStorage {
         return jdbcTemplate.query(sql, new ReviewMapper(), filmId)
                 .stream()
                 .sorted(new ReviewComparator())
+                .limit(count)
                 .collect(Collectors.toList());
     }
 
     @Override
+    public List<Review> getAllReviews(int count) {
+        String sql = "SELECT rv.reviewId, rv.content, rv.userId, rv.filmId, rv.isPositive, " +
+                "COUNT(DISTINCT rl.userId) AS count_like, COUNT(DISTINCT rdl.userId) AS count_dislike " +
+                "FROM review AS rv LEFT OUTER JOIN review_likes rl ON rv.reviewId = rl.reviewId " +
+                "LEFT OUTER JOIN review_dislikes rdl ON rv.reviewId = rdl.reviewId " +
+                "GROUP BY rv.reviewId";
+        return jdbcTemplate.query(sql, new ReviewMapper())
+                .stream()
+                .sorted(new ReviewComparator())
+                .limit(count)
+                .collect(Collectors.toList());
+    }
+    @Override
     public Review update(Review review) {
-        String sql = "UPDATE review SET content = ?, isPositive = ?, userId = ?, filmId = ? WHERE reviewId = ?";
-        jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getUserId(), review.getFilmId(), review.getReviewId());
+        String sql = "UPDATE review SET content = ?, isPositive = ? WHERE reviewId = ?";
+        jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
         return getById(review.getReviewId()).get();
     }
 
