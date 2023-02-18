@@ -212,28 +212,40 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    //TODO: Заменить getDescription на getDirector когда поле появится
     public List<Film> searchFilms(String query, SearchBy type) {
         String sql;
         List<Film> result = new ArrayList<>();
         switch (type) {
             case BOTH:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name ILIKE '%"+query+"%' " +
-                        "OR description LIKE '%"+query+"%'";
+                sql = "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID," +
+                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "JOIN film_directors AS fd ON f.film_id = fd.film_id " +
+                        "JOIN director AS d ON fd.director_id = d.director_id " +
+                        "WHERE (d.name ILIKE '%"+query+"%') " +
+                        "UNION " +
+                        "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID, " +
+                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "WHERE (f.name ILIKE '%"+query+"%') " +
+                        "ORDER BY FILM_ID DESC;";
                 result = jdbcTemplate.query(sql, new FilmMapper());
+                System.out.println(result);
                 break;
             case TITLE:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE name ILIKE '%"+query+"%'";
+                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id WHERE name ILIKE '%"+query+"%'";
                 result = jdbcTemplate.query(sql, new FilmMapper());
                 break;
             case DIRECTOR:
-                sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE description ILIKE '%"+query+"%'";
+                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "JOIN film_directors AS fd ON F.film_id = fd.film_id " +
+                        "JOIN director AS d ON d.director_id = fd.director_id " +
+                        "WHERE d.name ILIKE '%"+query+"%'";
                 result = jdbcTemplate.query(sql, new FilmMapper());
                 break;
         }
         for (Film film : result) {
             film.setGenres(getGenres(film));
             film.setLikesFromUsers(getLikes(film));
+            film.setDirectors(getDirectors(film));
         }
         System.out.println(result);
         return result;
