@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
+@Service
 public class ReviewService {
 
     private final ReviewStorage reviewStorage;
@@ -70,13 +72,23 @@ public class ReviewService {
                 .orElseThrow(() -> new ElementNotFoundException("Review with id " + id + " not found", id));
     }
 
-    public void addLike(int reviewId, int userId, boolean isLike) {
+    public void addLike(int reviewId, int userId) {
         validateReviewId(reviewId);
         validateUserId(userId);
-        reviewStorage.addLike(reviewId, userId, isLike);
+        reviewStorage.addLike(reviewId, userId);
     }
 
-    public void deleteLike(int reviewId, int userId, boolean isLike) {
-        reviewStorage.deleteLike(reviewId, userId, isLike);
+    public void deleteLike(int reviewId, int userId) {
+        reviewStorage.deleteLike(reviewId, userId);
+    }
+
+    public void addDislike(int reviewId, int userId) {
+        validateReviewId(reviewId);
+        validateUserId(userId);
+        reviewStorage.addDislike(reviewId, userId);
+    }
+
+    public void deleteDislike(int reviewId, int userId) {
+        reviewStorage.deleteDislike(reviewId, userId);
     }
 }

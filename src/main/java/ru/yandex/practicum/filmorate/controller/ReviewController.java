@@ -7,6 +7,7 @@ import ru.yandex.practicum.filmorate.model.Review;
 import ru.yandex.practicum.filmorate.service.ReviewService;
 
 import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 
 @RestController
@@ -18,12 +19,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping
-    public Review create(@Validated Review review) {
+    public Review create(@Validated @RequestBody Review review) {
         return reviewService.add(review);
     }
 
     @PutMapping
-    public Review update(@Validated Review review) {
+    public Review update(@Validated @RequestBody Review review) {
         return reviewService.update(review);
     }
 
@@ -38,29 +39,29 @@ public class ReviewController {
     }
 
     @GetMapping
-    public List<Review> getByFilmId(@RequestParam(name = "filmId") @Positive int filmId,
+    public List<Review> getByFilmId(@RequestParam(name = "filmId", defaultValue = "0") @PositiveOrZero int filmId,
                                     @RequestParam(name = "count", defaultValue = "10") @Positive int count) {
         return reviewService.getByFilmId(filmId, count);
     }
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable int id, @PathVariable int userId) {
-        reviewService.addLike(id, userId, true);
+        reviewService.addLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
     public void deleteLike(@PathVariable int id, @PathVariable int userId) {
-        reviewService.deleteLike(id, userId, true);
+        reviewService.deleteLike(id, userId);
     }
 
     @PutMapping("/{id}/dislike/{userId}")
     public void addDislike(@PathVariable int id, @PathVariable int userId) {
-        reviewService.addLike(id, userId, false);
+        reviewService.addDislike(id, userId);
     }
 
-    @DeleteMapping("/{id}/like/{userId}")
+    @DeleteMapping("/{id}/dislike/{userId}")
     public void deleteDislike(@PathVariable int id, @PathVariable int userId) {
-        reviewService.deleteLike(id, userId, false);
+        reviewService.deleteDislike(id, userId);
     }
 
 }
