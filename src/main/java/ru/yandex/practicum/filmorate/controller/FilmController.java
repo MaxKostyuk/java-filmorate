@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmsSortBy;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -55,5 +56,10 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
         return service.getMostPopular(count);
+    }
+
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorFilms(@PathVariable int directorId, @RequestParam(defaultValue = "year") FilmsSortBy sortBy) {
+        return service.getDirectorFilms(directorId, sortBy);
     }
 }
