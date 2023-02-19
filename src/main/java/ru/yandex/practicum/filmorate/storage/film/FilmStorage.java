@@ -11,6 +11,7 @@ public interface FilmStorage {
 
     List<Film> getAll();
     Optional<Film> getById(int id);
+    List<Film> getByDirector(int directorId, FilmsSortBy sortBy);
 
     Film update(Film film);
 

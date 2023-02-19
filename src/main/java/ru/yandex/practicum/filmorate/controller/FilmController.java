@@ -6,6 +6,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
+import ru.yandex.practicum.filmorate.storage.film.FilmsSortBy;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
@@ -57,6 +58,11 @@ public class FilmController {
         return service.getMostPopular(count);
     }
 
+    @GetMapping("/director/{directorId}")
+    public List<Film> getDirectorFilms(@PathVariable int directorId, @RequestParam(defaultValue = "year") FilmsSortBy sortBy) {
+        return service.getDirectorFilms(directorId, sortBy);
+    }
+    
     //Метод удаления фильма по ИД
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable int id) {
