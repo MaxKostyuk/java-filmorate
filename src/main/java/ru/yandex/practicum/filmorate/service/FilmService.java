@@ -123,6 +123,7 @@ public class FilmService {
         }
     }
 
+
     public List<Film> searchFilms(String query, List<String> by) {
         if (by.isEmpty()){
             throw new IllegalArgumentException("Поля для поиска не заданы. Поиск возможен только по названию и/или режиссёру.");
@@ -137,4 +138,10 @@ public class FilmService {
         System.out.println("ничего");
         throw new IllegalArgumentException("Поиск возможен только по названию и/или режиссёру.");
     }
+
+    //Метод удаления фильма по его ИД
+    public void deleteById(int id) {
+         filmStorage.delete(id);
+    }
+
 }

@@ -31,7 +31,18 @@ import java.util.stream.Collectors;
 @Primary
 public class FilmDbStorage implements FilmStorage {
 
+    /*
+      Константа POWER_OF_RELATIONSHIP определяет максимальное количество наиболее схожих пользователей
+      лайки которых используются для формирования рекомендаций по просмотру фильмов
+      Цель ограничения: если оставить слишком много схожих пользователей, то полученная выборка
+      рекомендованных фильмов может быть огромно и выбрать из нее что-то крайне сложно,
+      более того без ограничения в крайнем случае может сложиться ситуация когда рекомендация к просмотру
+      может содержать вообще все фильмы.
+     */
+    private static final int POWER_OF_RELATIONSHIP = 10;
+
     private final JdbcTemplate jdbcTemplate;
+
 
     @Override
     public Film create(Film film) {
@@ -313,6 +324,41 @@ public class FilmDbStorage implements FilmStorage {
         }
         System.out.println(result);
         return result;
+    }
+
+    //Метод формирует список фильмов рекомендованных к просмотру для пользователя с id указанным в userId
+    public List<Film> getRecommendations(int userId) {
+        /*
+          Получаем из БД перечень фильмов которые посмотрели пользователи имеющие схожие интересы (то есть лайкали
+          те же фильмы, что и пользователь, которому нужна рекомендация, но при этом так же лайкали и фильмы,
+          которые не смотрел данный пользователь.
+         */
+        String sql = "SELECT * " +
+                "FROM FILM AS F " +
+                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
+                "WHERE F.FILM_ID IN ( SELECT DISTINCT FILM_ID " +
+                "                     FROM FILM_LIKES " +
+                "                     WHERE USER_ID IN (SELECT USER_ID " +
+                "                                       FROM (SELECT DISTINCT USER_ID, COUNT(FILM_ID) AS SIMULARITY " +
+                "                                             FROM FILM_LIKES " +
+                "                                             WHERE FILM_ID IN (SELECT FILM_ID " +
+                "                                                               FROM FILM_LIKES " +
+                "                                                               WHERE USER_ID = ?) " +
+                "                                             AND USER_ID <> ? " +
+                "                                             GROUP BY USER_ID " +
+                "                                             ORDER BY SIMULARITY DESC " +
+                "                                             LIMIT ?)) " +
+                "                     AND FILM_ID NOT IN (SELECT FILM_ID " +
+                "                                         FROM FILM_LIKES " +
+                "                                         WHERE USER_ID = ?));";
+
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(),  userId, userId, POWER_OF_RELATIONSHIP, userId);
+        for (Film film : films) {
+            film.setGenres(getGenres(film));
+            film.setLikesFromUsers(getLikes(film));
+            film.setDirectors(getDirectors(film));
+        }
+        return films;
     }
 
 }

@@ -70,4 +70,10 @@ public class FilmController {
                                   @RequestParam("by") List<String> by) {
         return service.searchFilms(query, by);
     }
+    
+    //Метод удаления фильма по ИД
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable int id) {
+        service.deleteById(id);
+    }
 }
