@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -283,6 +284,46 @@ public class FilmDbStorage implements FilmStorage {
         public Integer mapRow(ResultSet rs, int rowNum) throws SQLException {
             return rs.getInt("user_id");
         }
+    }
+
+    @Override
+    public List<Film> searchFilms(String query, SearchBy type) {
+        String sql;
+        List<Film> result = new ArrayList<>();
+        switch (type) {
+            case BOTH:
+                sql = "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID," +
+                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "JOIN film_directors AS fd ON f.film_id = fd.film_id " +
+                        "JOIN director AS d ON fd.director_id = d.director_id " +
+                        "WHERE (d.name ILIKE '%"+query+"%') " +
+                        "UNION " +
+                        "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID, " +
+                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "WHERE (f.name ILIKE '%"+query+"%') " +
+                        "ORDER BY FILM_ID DESC;";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                System.out.println(result);
+                break;
+            case TITLE:
+                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id WHERE name ILIKE '%"+query+"%'";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                break;
+            case DIRECTOR:
+                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "JOIN film_directors AS fd ON F.film_id = fd.film_id " +
+                        "JOIN director AS d ON d.director_id = fd.director_id " +
+                        "WHERE d.name ILIKE '%"+query+"%'";
+                result = jdbcTemplate.query(sql, new FilmMapper());
+                break;
+        }
+        for (Film film : result) {
+            film.setGenres(getGenres(film));
+            film.setLikesFromUsers(getLikes(film));
+            film.setDirectors(getDirectors(film));
+        }
+        System.out.println(result);
+        return result;
     }
 
     //Метод формирует список фильмов рекомендованных к просмотру для пользователя с id указанным в userId

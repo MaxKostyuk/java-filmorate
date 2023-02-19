@@ -1,9 +1,11 @@
 package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
+import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
+import java.util.*;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +65,36 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public void delete(int id) {
         filmMap.remove(id);
+    }
+
+    @Override
+    public List<Film> searchFilms(String query, SearchBy type) {
+        List<Film> result = new ArrayList<>();
+        switch (type) {
+            case BOTH:
+                for (int i = 0; i < filmMap.size(); i++) {
+                    if (filmMap.get(i).getName().contains(query) ||
+                            filmMap.get(i).getDirectors().contains(query)) {
+                        result.add(filmMap.get(i));
+                    }
+                }
+                break;
+            case TITLE:
+                for (int i = 0; i < filmMap.size(); i++) {
+                    if (filmMap.get(i).getName().contains(query)) {
+                        result.add(filmMap.get(i));
+                    }
+                }
+                break;
+            case DIRECTOR:
+                for (int i = 0; i < filmMap.size(); i++) {
+                    if (filmMap.get(i).getDirectors().contains(query)) {
+                        result.add(filmMap.get(i));
+                    }
+                }
+                break;
+        }
+        return result;
     }
 
     private int getNextId() {
