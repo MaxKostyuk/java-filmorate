@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmsSortBy;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -143,5 +144,12 @@ public class FilmService {
     public void deleteById(int id) {
          filmStorage.delete(id);
     }
+
+
+    //Метод получения наиболее популярных фильмов по жанру в определенном году
+    public List<Film> getMostPopularByGenreAndYear(int count, int genreId, int year) {
+        return ((FilmDbStorage) filmStorage).getMostPopularByGenreAndYear(count, genreId, year);
+    }
+
 
 }
