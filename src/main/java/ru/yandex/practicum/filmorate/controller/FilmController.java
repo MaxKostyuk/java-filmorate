@@ -62,4 +62,10 @@ public class FilmController {
     public List<Film> getDirectorFilms(@PathVariable int directorId, @RequestParam(defaultValue = "year") FilmsSortBy sortBy) {
         return service.getDirectorFilms(directorId, sortBy);
     }
+    
+    //Метод удаления фильма по ИД
+    @DeleteMapping("/{id}")
+    public void deleteById(@PathVariable int id) {
+        service.deleteById(id);
+    }
 }

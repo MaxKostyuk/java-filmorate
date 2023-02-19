@@ -90,5 +90,11 @@ public class UserService {
     public List<Film> getRecommendations(int userId) {
         return ((FilmDbStorage) filmStorage).getRecommendations(userId);
     }
+    
+    //Метод удаления пользователя по его id
+    public void deleteById(int id) {
+        userStorage.delete(id);
+    }
+
 
 }

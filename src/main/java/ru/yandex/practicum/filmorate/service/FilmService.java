@@ -121,4 +121,9 @@ public class FilmService {
                             .collect(Collectors.toCollection(LinkedHashSet::new)));
         }
     }
+
+    public void deleteById(int id) {
+         filmStorage.delete(id);
+    }
+
 }
