@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -65,6 +66,7 @@ public class UserService {
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
         userStorage.update(user1);
+        userStorage.addFriendEvent(id, friendId);
         log.info("User with id {} was updated", id);
     }
 
@@ -90,10 +92,14 @@ public class UserService {
     public List<Film> getRecommendations(int userId) {
         return ((FilmDbStorage) filmStorage).getRecommendations(userId);
     }
-    
+
     //Метод удаления пользователя по его id
     public void deleteById(int id) {
         userStorage.delete(id);
+    }
+
+    public List<UserEvent> getUserEvents(int userId) {
+        return userStorage.getUserEvents(userId);
     }
 
 

@@ -10,11 +10,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 
+import java.sql.*;
 import java.sql.Date;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -63,6 +63,10 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         String sql = "UPDATE user_list SET email = ?, login = ?, name = ?, birthday = ? WHERE USER_ID = ?";
+        String event = "UPDATE user_events SET event_type = ?, operation = ?, entity_id = ?, timestamp = ? WHERE USER_ID = ?";
+
+        jdbcTemplate.update(event, "USER", "ADD", user.getId(), new Date(System.currentTimeMillis()), user.getId());
+
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         updateFriends(user);
         return getById(user.getId()).get();
@@ -71,6 +75,27 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void delete(int id) {
         jdbcTemplate.update("DELETE FROM USER_LIST WHERE USER_ID = ?", id);
+    }
+
+    @Override
+    public List<UserEvent> getUserEvents(int userId) {
+            String sql = "SELECT * FROM user_events WHERE user_id = ? ORDER BY timestamp DESC LIMIT 10";
+            return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) ->
+                    new UserEvent(
+                            rs.getInt("event_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("event_type"),
+                            rs.getString("operation"),
+                            rs.getInt("entity_id"),
+                            rs.getTimestamp("timestamp").getTime()
+                    )
+            );
+    }
+
+    @Override
+    public void addFriendEvent(int userId, int friendId) {
+        String event = "insert into user_events(user_id, event_type, operation, entity_id, timestamp) values (?,?,?,?,?)";
+        jdbcTemplate.update(event, userId, "FRIEND", "ADD", friendId, Timestamp.valueOf(LocalDateTime.now()));
     }
 
     private Set<Integer> getFriends(User user) {
