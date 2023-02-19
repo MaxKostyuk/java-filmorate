@@ -4,7 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.util.*;
@@ -16,6 +19,7 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
 
     public List<User> getAll() {
         return userStorage.getAll();
@@ -81,4 +85,10 @@ public class UserService {
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
     }
+
+    //Метод возвращает рекомендованные к просмотру фильмы
+    public List<Film> getRecommendations(int userId) {
+        return ((FilmDbStorage) filmStorage).getRecommendations(userId);
+    }
+
 }
