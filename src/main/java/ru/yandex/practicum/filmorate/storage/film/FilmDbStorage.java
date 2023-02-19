@@ -361,4 +361,53 @@ public class FilmDbStorage implements FilmStorage {
         return films;
     }
 
+    //Метод возвращает количество count самых популярных фильмов жанра genreId вышедших в году year
+    public List<Film> getMostPopularByGenreAndYear(int count, int genreId, int year) {
+
+        //Базовая часть запроса выбирающего N лучших фильмов
+        String sql = "SELECT * " +
+                "FROM FILM AS F " +
+                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
+                "LEFT OUTER JOIN (SELECT FILM_ID, COUNT(USER_ID) AS TOP " +
+                "                 FROM FILM_LIKES " +
+                "                 GROUP BY FILM_ID) AS BF ON BF.FILM_ID = F.FILM_ID ";
+
+
+        /*Если указан жанр, но не указан год, то накладываем ограничение на жанр.
+          Если указан только год, но не указан жанр, то накладываем ограничение только на год
+          Если указан и год и жанр, то накладываем ограничения на оба параметра
+         */
+        if (genreId != -1 && year == -1) {
+            sql +=  "LEFT OUTER JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID " +
+                    "WHERE FG.GENRE_ID = ? ";
+        } else if (genreId == -1 && year != -1) {
+            sql += "WHERE EXTRACT(YEAR FROM CAST(RELEASEDATE AS DATE)) = ? ";
+        } else {
+            sql += "LEFT OUTER JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID " +
+                    "WHERE FG.GENRE_ID = ? " +
+                    "  AND EXTRACT(YEAR FROM CAST(RELEASEDATE AS DATE)) = ? ";
+        }
+
+        //Завершение конструкции выбор count лучших фильмов
+        sql += "ORDER BY BF.TOP DESC " +
+                "LIMIT ?;";
+
+        //Получаем фильмы соответсвующие запросу
+        List<Film> films = new ArrayList<>();
+        if (genreId != -1 && year == -1) {
+            films = jdbcTemplate.query(sql, new FilmMapper(), genreId, count);
+        } else if (genreId == -1 && year != -1) {
+            films = jdbcTemplate.query(sql, new FilmMapper(), year, count);
+        } else {
+            films = jdbcTemplate.query(sql, new FilmMapper(), genreId, year, count);;
+        }
+
+        for (Film film : films) {
+            film.setGenres(getGenres(film));
+            film.setLikesFromUsers(getLikes(film));
+            film.setDirectors(getDirectors(film));
+        }
+
+        return films;
+    }
 }

@@ -13,6 +13,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -55,11 +56,6 @@ public class FilmController {
         service.deleteLikeOfFilm(id, userId);
     }
 
-    @GetMapping("/popular")
-    public List<Film> getMostPopular(@RequestParam(defaultValue = "10") @Positive int count) {
-        return service.getMostPopular(count);
-    }
-
     @GetMapping("/director/{directorId}")
     public List<Film> getDirectorFilms(@PathVariable int directorId, @RequestParam(defaultValue = "year") FilmsSortBy sortBy) {
         return service.getDirectorFilms(directorId, sortBy);
@@ -75,5 +71,23 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public void deleteById(@PathVariable int id) {
         service.deleteById(id);
+    }
+
+    //Метод возвращает наиболее популярные фильмы с возможностью фильтрации по году и жанру
+    @GetMapping("/popular")
+    public List<Film> getMostPopularByGenreAndYear(@RequestParam(name = "count", defaultValue = "10") @Positive int count,
+                                                   @RequestParam(name = "genreId", required = false) Optional<Integer> genreId,
+                                                   @RequestParam(name = "year", required = false) Optional<Integer> year) {
+
+        if (genreId.isPresent() && genreId.get() > 0 && year.isPresent() && year.get() > 1894) {
+            return service.getMostPopularByGenreAndYear(count, genreId.get(), year.get());
+        } else if (genreId.isPresent() && genreId.get() > 0 && year.isEmpty()) {
+            return service.getMostPopularByGenreAndYear(count, genreId.get(), -1);
+        } else if (genreId.isEmpty() && year.isPresent() && year.get() > 1894) {
+            return service.getMostPopularByGenreAndYear(count, -1, year.get());
+        } else {
+            //авторский метод сохранил как и обсуждали
+            return service.getMostPopular(count);
+        }
     }
 }
