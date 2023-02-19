@@ -2,18 +2,24 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.IncorrectResultSizeDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.constants.SearchBy;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmsSortBy;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.storage.rating.RatingStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -25,6 +31,7 @@ public class FilmService {
     private final UserStorage userStorage;
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
+    private final DirectorStorage directorStorage;
 
     public List<Film> getAllFilms() {
         return filmStorage.getAll();
@@ -48,6 +55,7 @@ public class FilmService {
         filmToUpdate.setDuration(film.getDuration());
         filmToUpdate.setMpa(film.getMpa());
         filmToUpdate.setGenres(film.getGenres());
+        filmToUpdate.setDirectors(film.getDirectors());
         filmStorage.update(filmToUpdate);
         log.info("Film with id {} was updated", film.getId());
         return filmToUpdate;
@@ -77,6 +85,15 @@ public class FilmService {
                 .sorted((f0, f1) -> f1.getLikesFromUsers().size() - f0.getLikesFromUsers().size())
                 .limit(size)
                 .collect(Collectors.toList());
+    }
+
+    public List<Film> getDirectorFilms(int directorId, FilmsSortBy sortBy) {
+        try {
+            directorStorage.get(directorId);
+        } catch (IncorrectResultSizeDataAccessException ex) {
+            throw new ElementNotFoundException("Film with id " + directorId + " not found", directorId);
+        }
+        return filmStorage.getByDirector(directorId, sortBy);
     }
 
     public Film getById(int id) {

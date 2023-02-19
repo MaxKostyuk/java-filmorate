@@ -2,9 +2,17 @@ package ru.yandex.practicum.filmorate.storage.film;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.constants.SearchBy;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.*;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 public class InMemoryFilmStorage implements FilmStorage {
@@ -22,6 +30,25 @@ public class InMemoryFilmStorage implements FilmStorage {
     @Override
     public List<Film> getAll() {
         return List.copyOf(filmMap.values());
+    }
+
+    @Override
+    public List<Film> getByDirector(int directorId, FilmsSortBy sortBy) {
+        Comparator<Film> orderByDefault = Comparator.comparingInt(Film::getId);
+        Comparator<Film> orderByYear = Comparator.comparing(Film::getReleaseDate);
+        Comparator<Film> orderByLikesCount = Comparator.comparingInt(f -> Optional.ofNullable(f.getLikesFromUsers()).orElse(new HashSet<>()).size());
+
+        Comparator<Film> comparator = sortBy == FilmsSortBy.YEAR
+                ? orderByYear
+                : sortBy == FilmsSortBy.LIKES
+                ? orderByLikesCount
+                : orderByDefault;
+
+        return filmMap.values().stream()
+                .filter((film -> Optional.ofNullable(film.getDirectors()).orElse(new HashSet<>()).stream()
+                        .map(Director::getId).collect(Collectors.toSet()).contains(directorId)))
+                .sorted(comparator)
+                .collect(Collectors.toList());
     }
 
     @Override

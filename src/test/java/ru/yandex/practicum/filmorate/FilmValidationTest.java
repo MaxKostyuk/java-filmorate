@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Rating;
@@ -27,13 +28,14 @@ public class FilmValidationTest {
     LocalDate correctReleaseDate = LocalDate.now();
     Rating correctMpa = new Rating();
     Set<Genre> correctGenre = new HashSet<>();
+    Set<Director> directors = new HashSet<>();
     int incorrectDuration = 0;
     int correctDuration = 1;
     Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     public void filmValidation_whenNullName_returnConstraintViolation() {
-        Film film = new Film(correctId, nullName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, nullName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -45,7 +47,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenBlankName_returnConstraintViolation() {
-        Film film = new Film(correctId, blankName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, blankName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -57,7 +59,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenNameOnlySpaces_returnConstraintViolation() {
-        Film film = new Film(correctId, nameOnlySpaces, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, nameOnlySpaces, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -69,7 +71,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenDescriptionMoreThan200Characters_returnConstraintViolation() {
-        Film film = new Film(correctId, correctName, descriptionMore200Characters, correctReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, correctName, descriptionMore200Characters, correctReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -81,7 +83,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenIncorrectReleaseDate_returnConstraintViolation() {
-        Film film = new Film(correctId, correctName, correctDescription, incorrectReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, correctName, correctDescription, incorrectReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -93,7 +95,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenIncorrectDuration_returnConstraintViolation() {
-        Film film = new Film(correctId, correctName, correctDescription, correctReleaseDate, incorrectDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, correctName, correctDescription, correctReleaseDate, incorrectDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         ConstraintViolation<Film> violation = violations.stream().findFirst()
@@ -105,7 +107,7 @@ public class FilmValidationTest {
 
     @Test
     public void filmValidation_whenAllFieldsCorrect_returnNoConstraintViolation() {
-        Film film = new Film(correctId, correctName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre);
+        Film film = new Film(correctId, correctName, correctDescription, correctReleaseDate, correctDuration, correctMpa, correctGenre, directors);
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
 
