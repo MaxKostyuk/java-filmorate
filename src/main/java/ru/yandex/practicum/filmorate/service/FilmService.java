@@ -151,5 +151,8 @@ public class FilmService {
         return ((FilmDbStorage) filmStorage).getMostPopularByGenreAndYear(count, genreId, year);
     }
 
-
+    //Метод возвращает общие фильмы двух пользователей
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        return ((FilmDbStorage) filmStorage).getCommonFilms(userId, friendId);
+    }
 }

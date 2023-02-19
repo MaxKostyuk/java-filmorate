@@ -410,4 +410,27 @@ public class FilmDbStorage implements FilmStorage {
 
         return films;
     }
+
+    //Метод возвращает общие фильмы двух пользователей
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        String sql = "SELECT * " +
+                "FROM FILM AS F " +
+                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
+                "WHERE FILM_ID IN (SELECT L.FILM_ID FROM FILM_LIKES AS L " +
+                "                  WHERE USER_ID = ? " +
+                "                  AND FILM_ID IN (SELECT FILM_ID FROM FILM_LIKES " +
+                "                                  WHERE USER_ID = ?));";
+
+        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
+        for (Film film : films) {
+            film.setGenres(getGenres(film));
+            film.setLikesFromUsers(getLikes(film));
+        }
+
+        if (films.size() == 0) {
+            return new ArrayList<>();
+        }
+
+        return films;
+    }
 }
