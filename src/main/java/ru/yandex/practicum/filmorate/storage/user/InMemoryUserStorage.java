@@ -45,11 +45,6 @@ public class InMemoryUserStorage implements UserStorage {
         return null;
     }
 
-    @Override
-    public void addFriendEvent(int userId, int friendId) {
-
-    }
-
     private int getNextId() {
         return ++idCounter;
     }

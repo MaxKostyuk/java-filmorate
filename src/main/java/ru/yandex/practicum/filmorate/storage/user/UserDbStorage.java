@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -12,8 +11,8 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 
-import java.sql.*;
 import java.sql.Date;
+import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +43,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM user_list ORDER BY USER_ID", new UserMapper());
-        for(User user : users) {
+        for (User user : users) {
             user.setFriendsList(getFriends(user));
         }
         return users;
@@ -63,10 +62,6 @@ public class UserDbStorage implements UserStorage {
     @Override
     public User update(User user) {
         String sql = "UPDATE user_list SET email = ?, login = ?, name = ?, birthday = ? WHERE USER_ID = ?";
-        String event = "UPDATE user_events SET event_type = ?, operation = ?, entity_id = ?, timestamp = ? WHERE USER_ID = ?";
-
-        jdbcTemplate.update(event, "USER", "ADD", user.getId(), new Date(System.currentTimeMillis()), user.getId());
-
         jdbcTemplate.update(sql, user.getEmail(), user.getLogin(), user.getName(), user.getBirthday(), user.getId());
         updateFriends(user);
         return getById(user.getId()).get();
@@ -79,23 +74,19 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<UserEvent> getUserEvents(int userId) {
-            String sql = "SELECT * FROM user_events WHERE user_id = ? ORDER BY timestamp DESC LIMIT 10";
-            return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) ->
-                    new UserEvent(
-                            rs.getInt("event_id"),
-                            rs.getInt("user_id"),
-                            rs.getString("event_type"),
-                            rs.getString("operation"),
-                            rs.getInt("entity_id"),
-                            rs.getTimestamp("timestamp").getTime()
-                    )
-            );
-    }
-
-    @Override
-    public void addFriendEvent(int userId, int friendId) {
-        String event = "insert into user_events(user_id, event_type, operation, entity_id, timestamp) values (?,?,?,?,?)";
-        jdbcTemplate.update(event, userId, "FRIEND", "ADD", friendId, Timestamp.valueOf(LocalDateTime.now()));
+        String sql = "select * FROM USER_EVENTS as u " +
+        "WHERE u.USER_ID = ?  " +
+                "ORDER BY EVENT_ID;";
+        return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) ->
+                new UserEvent(
+                        rs.getInt("event_id"),
+                        rs.getString("event_type"),
+                        rs.getString("operation"),
+                        rs.getInt("user_id"),
+                        rs.getInt("entity_id"),
+                        rs.getTimestamp("timestamp").getTime()
+                )
+        );
     }
 
     private Set<Integer> getFriends(User user) {
@@ -112,7 +103,7 @@ public class UserDbStorage implements UserStorage {
         Set<Integer> friendsToDelete = new HashSet<>(oldFriendsList);
         friendsToDelete.removeAll(newFriendsList);
         ArrayList<Integer> friendsToDeleteAsList = new ArrayList<>(friendsToDelete);
-        if(!friendsToDeleteAsList.isEmpty()) {
+        if (!friendsToDeleteAsList.isEmpty()) {
             jdbcTemplate.batchUpdate("DELETE FROM FRIENDS_LIST WHERE SENDER_ID = ? AND ACCEPTER_ID = ?", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -127,7 +118,7 @@ public class UserDbStorage implements UserStorage {
             });
         }
         ArrayList<Integer> friendsToAddAsList = new ArrayList<>(friendsToAdd);
-        if(!friendsToAddAsList.isEmpty()) {
+        if (!friendsToAddAsList.isEmpty()) {
             jdbcTemplate.batchUpdate("INSERT INTO FRIENDS_LIST (SENDER_ID, ACCEPTER_ID, STATUS_ID) VALUES (?,?,?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -160,6 +151,7 @@ public class UserDbStorage implements UserStorage {
             return user;
         }
     }
+
     private class FriendsMapper implements RowMapper<Integer> {
 
         @Override

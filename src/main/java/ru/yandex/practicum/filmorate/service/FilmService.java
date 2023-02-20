@@ -9,7 +9,9 @@ import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmsSortBy;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
@@ -32,6 +34,7 @@ public class FilmService {
     private final RatingStorage ratingStorage;
     private final GenreStorage genreStorage;
     private final DirectorStorage directorStorage;
+    private final EventStorage eventStorage;
 
     public List<Film> getAllFilms() {
         return filmStorage.getAll();
@@ -61,22 +64,35 @@ public class FilmService {
         return filmToUpdate;
     }
 
-    public void addLikeToFilm(int id, int userId) {
+    public void addLikeToFilm(int filmId, int userId) {
         User user = userStorage.getById(userId)
-                .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
-        Film film = getById(id);
+                .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
+        Film film = getById(filmId);
         film.getLikesFromUsers().add(userId);
+        eventStorage.createEvent(new UserEvent(
+                "LIKE",
+                "ADD",
+                userId,
+                filmId
+        ));
         filmStorage.update(film);
-        log.info("Film with id {} was updated", film.getId());
+
+        log.info("Film with filmId {} was updated", film.getId());
     }
 
-    public void deleteLikeOfFilm(int id, int userId) {
+    public void deleteLikeOfFilm(int filmId, int userId) {
         User user = userStorage.getById(userId)
-                .orElseThrow(() -> new ElementNotFoundException("User with id " + id + " not found", id));
-        Film film = getById(id);
+                .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
+        Film film = getById(filmId);
         film.getLikesFromUsers().remove(userId);
         filmStorage.update(film);
-        log.info("Film with id {} was updated", film.getId());
+        eventStorage.createEvent(new UserEvent(
+                "LIKE",
+                "REMOVE",
+                userId,
+                filmId
+        ));
+        log.info("Film with filmId {} was updated", film.getId());
     }
 
     public List<Film> getMostPopular(int size) {

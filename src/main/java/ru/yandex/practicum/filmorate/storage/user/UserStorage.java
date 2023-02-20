@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserStorage {
-
     User create(User user);
 
     List<User> getAll();
+
     Optional<User> getById(int id);
 
     User update(User user);
@@ -18,6 +18,4 @@ public interface UserStorage {
     void delete(int id);
 
     List<UserEvent> getUserEvents(int userId);
-
-    void addFriendEvent(int userId, int friendId);
 }
