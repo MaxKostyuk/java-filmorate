@@ -47,8 +47,8 @@ public class ReviewService {
         eventStorage.createEvent(new UserEvent(
                 "REVIEW",
                 "UPDATE",
-                review.getUserId(),
-                review.getReviewId()
+                updatedReview.getUserId(),
+                updatedReview.getReviewId()
         ));
         log.info("Review with id {} was updated", updatedReview.getReviewId());
         return updatedReview;
@@ -101,22 +101,10 @@ public class ReviewService {
         validateReviewId(reviewId);
         validateUserId(userId);
         reviewStorage.addLike(reviewId, userId);
-        eventStorage.createEvent(new UserEvent(
-                "REVIEW",
-                "UPDATE",
-                userId,
-                reviewId
-        ));
     }
 
     public void deleteLike(int reviewId, int userId) {
         reviewStorage.deleteLike(reviewId, userId);
-        eventStorage.createEvent(new UserEvent(
-                "REVIEW",
-                "UPDATE",
-                userId,
-                reviewId
-        ));
     }
 
     public void addDislike(int reviewId, int userId) {
