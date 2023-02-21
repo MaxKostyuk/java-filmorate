@@ -32,7 +32,7 @@ public class ReviewService {
                 "REVIEW",
                 "ADD",
                 review.getUserId(),
-                review.getFilmId()
+                createdReview.getReviewId()
         ));
         log.info("Review with id {} was added", createdReview.getReviewId());
         return createdReview;
@@ -48,7 +48,7 @@ public class ReviewService {
                 "REVIEW",
                 "UPDATE",
                 review.getUserId(),
-                review.getFilmId()
+                review.getReviewId()
         ));
         log.info("Review with id {} was updated", updatedReview.getReviewId());
         return updatedReview;
@@ -61,7 +61,7 @@ public class ReviewService {
                 "REVIEW",
                 "REMOVE",
                 review.getUserId(),
-                review.getFilmId()
+                id
         ));
         reviewStorage.delete(id);
     }
@@ -123,12 +123,6 @@ public class ReviewService {
         validateReviewId(reviewId);
         validateUserId(userId);
         reviewStorage.addDislike(reviewId, userId);
-        eventStorage.createEvent(new UserEvent(
-                "REVIEW",
-                "UPDATE",
-                userId,
-                reviewId
-        ));
     }
 
     public void deleteDislike(int reviewId, int userId) {
