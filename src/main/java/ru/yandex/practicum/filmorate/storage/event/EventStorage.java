@@ -5,7 +5,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 
-import java.sql.PreparedStatement;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
@@ -20,15 +19,12 @@ public class EventStorage {
 
     public void createEvent(UserEvent event) {
         String sqlQuery = "insert into USER_EVENTS(user_id, event_type, TIMESTAMP, ENTITY_ID, OPERATION) values (?,?,?,?,?)";
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sqlQuery);
-            stmt.setInt(1, event.getUserId());
-            stmt.setString(2, event.getEventType().toString());
-            stmt.setTimestamp(3, Timestamp.valueOf(LocalDateTime.now()));
-            stmt.setInt(4, event.getEntityId());
-            stmt.setString(5, event.getOperation().toString());
-            return stmt;
-        });
+        jdbcTemplate.update(sqlQuery,
+                event.getUserId(),
+                event.getEventType(),
+                Timestamp.valueOf(LocalDateTime.now()),
+                event.getEntityId(),
+                event.getOperation());
     }
 
     public void getEvent(int id) {
