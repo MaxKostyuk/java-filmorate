@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
+import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.review.ReviewStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -19,12 +21,19 @@ public class ReviewService {
     private final ReviewStorage reviewStorage;
     private final UserStorage userStorage;
     private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
 
     public Review add(Review review) {
         validateUserId(review.getUserId());
         validateFilmId(review.getFilmId());
         Review createdReview = reviewStorage.create(review);
+        eventStorage.createEvent(new UserEvent(
+                "REVIEW",
+                "ADD",
+                review.getUserId(),
+                createdReview.getReviewId()
+        ));
         log.info("Review with id {} was added", createdReview.getReviewId());
         return createdReview;
     }
@@ -35,12 +44,25 @@ public class ReviewService {
         validateFilmId(review.getFilmId());
         validateReviewId(review.getReviewId());
         Review updatedReview = reviewStorage.update(review);
+        eventStorage.createEvent(new UserEvent(
+                "REVIEW",
+                "UPDATE",
+                updatedReview.getUserId(),
+                updatedReview.getReviewId()
+        ));
         log.info("Review with id {} was updated", updatedReview.getReviewId());
         return updatedReview;
     }
 
 
     public void delete(int id) {
+        Review review = getById(id);
+        eventStorage.createEvent(new UserEvent(
+                "REVIEW",
+                "REMOVE",
+                review.getUserId(),
+                id
+        ));
         reviewStorage.delete(id);
     }
 
