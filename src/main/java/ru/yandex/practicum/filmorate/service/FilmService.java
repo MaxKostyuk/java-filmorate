@@ -164,11 +164,11 @@ public class FilmService {
 
     //Метод получения наиболее популярных фильмов по жанру в определенном году
     public List<Film> getMostPopularByGenreAndYear(int count, int genreId, int year) {
-        return ((FilmDbStorage) filmStorage).getMostPopularByGenreAndYear(count, genreId, year);
+        return filmStorage.getMostPopularByGenreAndYear(count, genreId, year);
     }
 
     //Метод возвращает общие фильмы двух пользователей
     public List<Film> getCommonFilms(int userId, int friendId) {
-        return ((FilmDbStorage) filmStorage).getCommonFilms(userId, friendId);
+        return filmStorage.getCommonFilms(userId, friendId);
     }
 }
