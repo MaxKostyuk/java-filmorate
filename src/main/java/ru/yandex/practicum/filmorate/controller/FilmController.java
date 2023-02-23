@@ -21,6 +21,7 @@ import java.util.Optional;
 @Validated
 @RequiredArgsConstructor
 public class FilmController {
+    public static final int YEAR_OF_FIRST_FILM = 1894;
 
     private final FilmService service;
 
@@ -76,19 +77,19 @@ public class FilmController {
     //Метод возвращает наиболее популярные фильмы с возможностью фильтрации по году и жанру
     @GetMapping("/popular")
     public List<Film> getMostPopularByGenreAndYear(@RequestParam(name = "count", defaultValue = "10") @Positive int count,
-                                                   @RequestParam(name = "genreId", required = false) Optional<Integer> genreId,
-                                                   @RequestParam(name = "year", required = false) Optional<Integer> year) {
+                                                   @RequestParam(name = "genreId", defaultValue = "-1") int genreId,
+                                                   @RequestParam(name = "year", defaultValue = "-1") int year) {
 
-        if (genreId.isPresent() && genreId.get() > 0 && year.isPresent() && year.get() > 1894) {
-            return service.getMostPopularByGenreAndYear(count, genreId.get(), year.get());
-        } else if (genreId.isPresent() && genreId.get() > 0 && year.isEmpty()) {
-            return service.getMostPopularByGenreAndYear(count, genreId.get(), -1);
-        } else if (genreId.isEmpty() && year.isPresent() && year.get() > 1894) {
-            return service.getMostPopularByGenreAndYear(count, -1, year.get());
-        } else {
+        //if (genreId > 0 && year > YEAR_OF_FIRST_FILM) {
+            return service.getMostPopularByGenreAndYear(count, genreId, year);
+        //} else if (genreId > 0 && year == -1) {
+        //    return service.getMostPopularByGenreAndYear(count, genreId.get(), -1);
+        //} else if (genreId.isEmpty() && year.isPresent() && year.get() > YEAR_OF_FIRST_FILM) {
+        //    return service.getMostPopularByGenreAndYear(count, -1, year.get());
+        //} else {
             //авторский метод сохранил как и обсуждали
-            return service.getMostPopular(count);
-        }
+        //    return service.getMostPopular(count);
+        //}
     }
 
     //Метод возвращает общие фильмы двух пользователей

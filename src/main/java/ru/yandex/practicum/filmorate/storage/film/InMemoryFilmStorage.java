@@ -100,4 +100,14 @@ public class InMemoryFilmStorage implements FilmStorage {
     private int getNextId() {
         return ++idCounter;
     }
+
+    @Override
+    public List<Film> getMostPopularByGenreAndYear(int count, int genreId, int year) {
+        return null;
+    }
+
+    @Override
+    public List<Film> getCommonFilms(int userId, int friendId) {
+        return null;
+    }
 }

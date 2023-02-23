@@ -9,6 +9,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.constants.SearchBy;
+import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
@@ -35,7 +36,7 @@ public class FilmDbStorage implements FilmStorage {
       Константа POWER_OF_RELATIONSHIP определяет максимальное количество наиболее схожих пользователей
       лайки которых используются для формирования рекомендаций по просмотру фильмов
       Цель ограничения: если оставить слишком много схожих пользователей, то полученная выборка
-      рекомендованных фильмов может быть огромно и выбрать из нее что-то крайне сложно,
+      рекомендованных фильмов может быть огромна и выбрать из нее что-то крайне сложно,
       более того без ограничения в крайнем случае может сложиться ситуация когда рекомендация к просмотру
       может содержать вообще все фильмы.
      */
@@ -333,104 +334,198 @@ public class FilmDbStorage implements FilmStorage {
           те же фильмы, что и пользователь, которому нужна рекомендация, но при этом так же лайкали и фильмы,
           которые не смотрел данный пользователь.
          */
-        String sql = "SELECT * " +
-                "FROM FILM AS F " +
-                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
-                "WHERE F.FILM_ID IN ( SELECT DISTINCT FILM_ID " +
-                "                     FROM FILM_LIKES " +
-                "                     WHERE USER_ID IN (SELECT USER_ID " +
-                "                                       FROM (SELECT DISTINCT USER_ID, COUNT(FILM_ID) AS SIMULARITY " +
-                "                                             FROM FILM_LIKES " +
-                "                                             WHERE FILM_ID IN (SELECT FILM_ID " +
-                "                                                               FROM FILM_LIKES " +
-                "                                                               WHERE USER_ID = ?) " +
-                "                                             AND USER_ID <> ? " +
-                "                                             GROUP BY USER_ID " +
-                "                                             ORDER BY SIMULARITY DESC " +
-                "                                             LIMIT ?)) " +
-                "                     AND FILM_ID NOT IN (SELECT FILM_ID " +
-                "                                         FROM FILM_LIKES " +
-                "                                         WHERE USER_ID = ?));";
+        String sqlRecommendation = "SELECT DISTINCT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "       f.rating_id, r.rating_name as rating, " +
+                "       fg.genre_id, g.genre_name as genre, " +
+                "       fd.director_id, d.name as director " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "INNER JOIN film_likes AS fl " +
+                "ON f.film_id = fl.film_id " +
+                "INNER JOIN (SELECT sf.user_id AS common_users FROM film_likes AS sf " +
+                "            INNER JOIN film_likes as uf " +
+                "            ON sf.film_id = uf.film_id " +
+                "            AND sf.user_id <> ? " +
+                "            GROUP BY sf.user_id " +
+                "            ORDER BY COUNT(sf.film_id) DESC " +
+                "            LIMIT ?) AS rf " +
+                "ON fl.user_id = rf.common_users " +
+                "LEFT OUTER JOIN (SELECT film_id AS films_to_remove FROM film_likes WHERE user_id = ?) AS rf " +
+                "ON f.film_id = rf.films_to_remove " +
+                "LEFT JOIN film_likes AS ef " +
+                "ON fl.film_id = ef.film_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d " +
+                "ON d.director_id = fd.director_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "WHERE rf.films_to_remove IS NULL;";
 
-        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(),  userId, userId, POWER_OF_RELATIONSHIP, userId);
-        for (Film film : films) {
-            film.setGenres(getGenres(film));
-            film.setLikesFromUsers(getLikes(film));
-            film.setDirectors(getDirectors(film));
-        }
-        return films;
+        return jdbcTemplate.query(sqlRecommendation, new FilmsMapper(), userId, POWER_OF_RELATIONSHIP, userId);
+
     }
 
     //Метод возвращает количество count самых популярных фильмов жанра genreId вышедших в году year
     public List<Film> getMostPopularByGenreAndYear(int count, int genreId, int year) {
 
-        //Базовая часть запроса выбирающего N лучших фильмов
-        String sql = "SELECT * " +
-                "FROM FILM AS F " +
-                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
-                "LEFT OUTER JOIN (SELECT FILM_ID, COUNT(USER_ID) AS TOP " +
-                "                 FROM FILM_LIKES " +
-                "                 GROUP BY FILM_ID) AS BF ON BF.FILM_ID = F.FILM_ID ";
+        String sqlMostPopularByGenreAndYear = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "       f.rating_id, r.rating_name AS rating, " +
+                "       fg.genre_id, g.genre_name AS genre, " +
+                "       fd.director_id, d.name AS director, " +
+                "       ff.likes " +
+                "FROM film AS f " +
+                "INNER JOIN (SELECT tf.film_id, bf.likes " +
+                "            FROM film AS tf " +
+                "            LEFT OUTER JOIN (SELECT film_id, COUNT(user_id) AS likes " +
+                "                             FROM film_likes " +
+                "                             GROUP BY film_id) as bf " +
+                "            ON tf.film_id = bf.film_id " +
+                "            LEFT JOIN film_genres AS fgs " +
+                "            ON tf.film_id = fgs.film_id " +
+                "            WHERE fgs.genre_id = ? " +
+                "            AND EXTRACT(YEAR FROM tf.releaseDate) = ? " +
+                "            ORDER BY bf.likes DESC " +
+                "            LIMIT ?) AS ff " +
+                "ON f.film_id = ff.film_id " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d ON d.director_id = fd.director_id;";
 
 
-        /*Если указан жанр, но не указан год, то накладываем ограничение на жанр.
-          Если указан только год, но не указан жанр, то накладываем ограничение только на год
-          Если указан и год и жанр, то накладываем ограничения на оба параметра
-         */
-        if (genreId != -1 && year == -1) {
-            sql +=  "LEFT OUTER JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID " +
-                    "WHERE FG.GENRE_ID = ? ";
-        } else if (genreId == -1 && year != -1) {
-            sql += "WHERE EXTRACT(YEAR FROM CAST(RELEASEDATE AS DATE)) = ? ";
+        String sqlMostPopularByGenre = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.rating_id, r.rating_name AS rating, " +
+                "fg.genre_id, g.genre_name AS genre, " +
+                "fd.director_id, d.name AS director, " +
+                "ff.likes " +
+                "FROM film AS f " +
+                "INNER JOIN (SELECT tf.film_id, bf.likes " +
+                "            FROM film AS tf " +
+                "            LEFT OUTER JOIN (SELECT film_id, COUNT(user_id) AS likes " +
+                "                             FROM film_likes " +
+                "                             GROUP BY film_id) as bf " +
+                "            ON tf.film_id = bf.film_id " +
+                "            LEFT JOIN film_genres AS fgs " +
+                "            ON tf.film_id = fgs.film_id " +
+                "            WHERE fgs.genre_id = ? " +
+                "            ORDER BY bf.likes DESC " +
+                "            LIMIT ?) AS ff " +
+                "ON f.film_id = ff.film_id " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d ON d.director_id = fd.director_id;";
+
+
+        String sqlMostPopularByYear = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "       f.rating_id, r.rating_name AS rating, " +
+                "       fg.genre_id, g.genre_name AS genre, " +
+                "       fd.director_id, d.name AS director, " +
+                "       ff.likes " +
+                "FROM film AS f " +
+                "INNER JOIN (SELECT tf.film_id, bf.likes " +
+                "            FROM film AS tf " +
+                "            LEFT OUTER JOIN (SELECT film_id, COUNT(user_id) AS likes " +
+                "                             FROM film_likes " +
+                "                             GROUP BY film_id) as bf " +
+                "            ON tf.film_id = bf.film_id " +
+                "            WHERE EXTRACT(YEAR FROM tf.releaseDate) = ? " +
+                "            ORDER BY bf.likes DESC " +
+                "            LIMIT ?) AS ff " +
+                "ON f.film_id = ff.film_id " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d ON d.director_id = fd.director_id;";
+
+        String sqlMostPopular = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "       f.rating_id, r.rating_name AS rating, " +
+                "       fg.genre_id, g.genre_name AS genre, " +
+                "       fd.director_id, d.name AS director, " +
+                "       ff.likes " +
+                "FROM film AS f " +
+                "INNER JOIN (SELECT tf.film_id, bf.likes " +
+                "            FROM film AS tf " +
+                "            LEFT OUTER JOIN (SELECT film_id, COUNT(user_id) AS likes " +
+                "                             FROM film_likes " +
+                "                             GROUP BY film_id) as bf " +
+                "            ON tf.film_id = bf.film_id " +
+                "            ORDER BY bf.likes DESC " +
+                "            LIMIT ?) AS ff " +
+                "ON f.film_id = ff.film_id " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d ON d.director_id = fd.director_id;";
+
+
+        if (genreId == -1 && year == -1) {
+            return jdbcTemplate.query(sqlMostPopular, new FilmsMapper(), count);
+        } else if (genreId == -1) {
+            return jdbcTemplate.query(sqlMostPopularByYear, new FilmsMapper(), year, count);
+        } else if (year == -1) {
+            return jdbcTemplate.query(sqlMostPopularByGenre, new FilmsMapper(), genreId, count);
         } else {
-            sql += "LEFT OUTER JOIN FILM_GENRES AS FG ON F.FILM_ID = FG.FILM_ID " +
-                    "WHERE FG.GENRE_ID = ? " +
-                    "  AND EXTRACT(YEAR FROM CAST(RELEASEDATE AS DATE)) = ? ";
+            return jdbcTemplate.query(sqlMostPopularByGenreAndYear, new FilmsMapper(), genreId, year, count);
         }
-
-        //Завершение конструкции выбор count лучших фильмов
-        sql += "ORDER BY BF.TOP DESC " +
-                "LIMIT ?;";
-
-        //Получаем фильмы соответсвующие запросу
-        List<Film> films = new ArrayList<>();
-        if (genreId != -1 && year == -1) {
-            films = jdbcTemplate.query(sql, new FilmMapper(), genreId, count);
-        } else if (genreId == -1 && year != -1) {
-            films = jdbcTemplate.query(sql, new FilmMapper(), year, count);
-        } else {
-            films = jdbcTemplate.query(sql, new FilmMapper(), genreId, year, count);;
-        }
-
-        for (Film film : films) {
-            film.setGenres(getGenres(film));
-            film.setLikesFromUsers(getLikes(film));
-            film.setDirectors(getDirectors(film));
-        }
-
-        return films;
     }
 
     //Метод возвращает общие фильмы двух пользователей
     public List<Film> getCommonFilms(int userId, int friendId) {
-        String sql = "SELECT * " +
-                "FROM FILM AS F " +
-                "JOIN RATING AS R ON F.RATING_ID = R.RATING_ID " +
-                "WHERE FILM_ID IN (SELECT L.FILM_ID FROM FILM_LIKES AS L " +
-                "                  WHERE USER_ID = ? " +
-                "                  AND FILM_ID IN (SELECT FILM_ID FROM FILM_LIKES " +
-                "                                  WHERE USER_ID = ?));";
 
-        List<Film> films = jdbcTemplate.query(sql, new FilmMapper(), userId, friendId);
-        for (Film film : films) {
-            film.setGenres(getGenres(film));
-            film.setLikesFromUsers(getLikes(film));
-        }
+        String sqlCommonFilms = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.rating_id, r.rating_name as rating, " +
+                "fg.genre_id, g.genre_name as genre, " +
+                "fd.director_id, d.name as director, " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_likes AS fl " +
+                "ON f.film_id = fl.film_id " +
+                "INNER JOIN (SELECT sf.user_id AS common_users FROM film_likes AS sf " +
+                "            INNER JOIN film_likes as uf " +
+                "            ON sf.film_id = uf.film_id " +
+                "            AND uf.user_id = ? " +
+                "            AND sf.user_id <> ? " +
+                "            GROUP BY sf.user_id " +
+                "            ORDER BY COUNT(sf.film_id) DESC " +
+                "            LIMIT ?) AS rf " +
+                "ON fl.user_id = rf.common_users AND common_users = ? " +
+                "JOIN film_likes AS ef " +
+                "ON fl.film_id = ef.film_id AND ef.user_id = ? " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d " +
+                "ON d.director_id = fd.director_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id;";
 
-        if (films.size() == 0) {
-            return new ArrayList<>();
-        }
-
-        return films;
+        return jdbcTemplate.query(sqlCommonFilms, new FilmsMapper(), userId, userId, POWER_OF_RELATIONSHIP, friendId , userId);
     }
 }
