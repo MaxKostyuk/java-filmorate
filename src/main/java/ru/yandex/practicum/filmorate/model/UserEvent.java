@@ -6,9 +6,8 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @Data
-@RequiredArgsConstructor
 @AllArgsConstructor
-@Builder
+@RequiredArgsConstructor
 public class UserEvent {
     private int eventId;
     private final String eventType;

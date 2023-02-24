@@ -24,6 +24,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static ru.yandex.practicum.filmorate.enums.SearchBy.DIRECTOR;
+import static ru.yandex.practicum.filmorate.enums.SearchBy.TITLE;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -144,12 +147,13 @@ public class FilmService {
         if (by.isEmpty()){
             throw new IllegalArgumentException("Поля для поиска не заданы. Поиск возможен только по названию и/или режиссёру.");
         }
-        if (by.contains("director") && by.contains("title")) {
+        by.replaceAll(String::toUpperCase);
+        if (by.contains(DIRECTOR.toString()) && by.contains(TITLE.toString())) {
             return filmStorage.searchFilms(query, SearchBy.BOTH);
-        } else if (by.contains("title")) {
+        } else if (by.contains(TITLE.toString())) {
             return filmStorage.searchFilms(query, SearchBy.TITLE);
-        } else if (by.contains("director")) {
-            return filmStorage.searchFilms(query, SearchBy.DIRECTOR);
+        } else if (by.contains(DIRECTOR.toString())) {
+            return filmStorage.searchFilms(query, DIRECTOR);
         }
         throw new IllegalArgumentException("Поиск возможен только по названию и/или режиссёру.");
     }
