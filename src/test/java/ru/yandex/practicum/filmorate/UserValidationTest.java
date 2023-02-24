@@ -25,7 +25,7 @@ public class UserValidationTest {
     private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 
-/*    @Test
+    @Test
     public void userValidation_whenNullEmail_returnConstraintViolation() {
         User user = new User(correctId, nullEmail, correctLogin, correctBirthday);
 
@@ -104,5 +104,5 @@ public class UserValidationTest {
         Set<ConstraintViolation<User>> violations = validator.validate(user);
 
         Assertions.assertEquals(0, violations.size());
-    }*/
+    }
 }

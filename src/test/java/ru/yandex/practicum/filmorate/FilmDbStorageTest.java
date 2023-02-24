@@ -25,7 +25,7 @@ public class FilmDbStorageTest {
 
     private final FilmDbStorage filmDbStorage;
 
-   /* @BeforeEach
+    @BeforeEach
     public void beforeEach() {
         Rating rating = new Rating();
         rating.setId(1);
@@ -83,5 +83,5 @@ public class FilmDbStorageTest {
         Film film = new Film(1, "otherName", "newDescription", LocalDate.now(), 100, rating, null, new HashSet<>());
         filmDbStorage.create(film);
         assertTrue(filmDbStorage.getAll().size() == 2);
-    }*/
+    }
 }
