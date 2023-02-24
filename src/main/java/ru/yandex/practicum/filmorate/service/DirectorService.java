@@ -17,11 +17,8 @@ public class DirectorService {
 
     public Director create(Director director) {
         int id = storage.create(director);
-        try {
-            return storage.get(id);
-        } catch (IncorrectResultSizeDataAccessException ex) {
-            throw new ElementNotFoundException(String.format(DIRECTOR_NOT_EXISTS_TEMPLATE, id), director);
-        }
+        String name = director.getName();
+        return Director.builder().id(id).name(name).build();
     }
 
     public Director update(Director director) {
@@ -29,7 +26,8 @@ public class DirectorService {
         try {
             storage.get(id);
             storage.update(director);
-            return storage.get(id);
+            String name = director.getName();
+            return Director.builder().id(id).name(name).build();
         } catch (IncorrectResultSizeDataAccessException ex) {
             throw new ElementNotFoundException(String.format(DIRECTOR_NOT_EXISTS_TEMPLATE, id), director);
         }
