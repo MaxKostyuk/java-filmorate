@@ -17,22 +17,18 @@ public class DirectorService {
 
     public Director create(Director director) {
         int id = storage.create(director);
-        try {
-            return storage.get(id);
-        } catch (IncorrectResultSizeDataAccessException ex) {
-            throw new ElementNotFoundException(String.format(DIRECTOR_NOT_EXISTS_TEMPLATE, id), director);
-        }
+        String name = director.getName();
+        return Director.builder().id(id).name(name).build();
     }
 
     public Director update(Director director) {
         int id = director.getId();
-        try {
-            storage.get(id);
-            storage.update(director);
-            return storage.get(id);
-        } catch (IncorrectResultSizeDataAccessException ex) {
+        int updatedRowsCount = storage.update(director);
+        if(updatedRowsCount == 0) {
             throw new ElementNotFoundException(String.format(DIRECTOR_NOT_EXISTS_TEMPLATE, id), director);
         }
+        String name = director.getName();
+        return Director.builder().id(id).name(name).build();
     }
 
     public Director get(int id) {
