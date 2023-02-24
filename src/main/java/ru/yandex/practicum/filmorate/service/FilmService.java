@@ -151,7 +151,6 @@ public class FilmService {
         } else if (by.contains("director")) {
             return filmStorage.searchFilms(query, SearchBy.DIRECTOR);
         }
-        System.out.println("ничего");
         throw new IllegalArgumentException("Поиск возможен только по названию и/или режиссёру.");
     }
 
