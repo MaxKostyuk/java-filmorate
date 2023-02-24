@@ -26,10 +26,16 @@ public class FilmsMapper implements ResultSetExtractor<List<Film>> {
                 Rating rating = new Rating();
                 rating.setId(resultSet.getInt("rating_id"));
                 rating.setName(resultSet.getString("rating"));
+                film = new Film();
 
-                film = new Film(resultSet.getInt("film_id"), resultSet.getString("name"),
-                        resultSet.getString("description"), resultSet.getDate("releaseDate").toLocalDate(),
-                        resultSet.getInt("duration"), rating, new HashSet<>(), new HashSet<>());
+                film.setId(resultSet.getInt("film_id"));
+                film.setName(resultSet.getString("name"));
+                film.setDescription(resultSet.getString("description"));
+                film.setReleaseDate(resultSet.getDate("releaseDate").toLocalDate());
+                film.setDuration(resultSet.getInt("duration"));
+                film.setMpa(rating);
+                film.setGenres(new HashSet<>());
+                film.setDirectors(new HashSet<>());
                 films.put(id, film);
             }
 
