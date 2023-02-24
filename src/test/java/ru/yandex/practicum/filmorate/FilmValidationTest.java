@@ -17,21 +17,21 @@ import java.util.Set;
 
 public class FilmValidationTest {
 
-    int correctId = 1;
-    String nullName = null;
-    String blankName = "";
-    String nameOnlySpaces = "  ";
-    String correctName = "name";
-    String descriptionMore200Characters = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901";
-    String correctDescription = "correct description";
-    LocalDate incorrectReleaseDate = LocalDate.of(1894, Month.DECEMBER, 1);
-    LocalDate correctReleaseDate = LocalDate.now();
-    Rating correctMpa = new Rating();
-    Set<Genre> correctGenre = new HashSet<>();
-    Set<Director> directors = new HashSet<>();
-    int incorrectDuration = 0;
-    int correctDuration = 1;
-    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private int correctId = 1;
+    private String nullName = null;
+    private String blankName = "";
+    private String nameOnlySpaces = "  ";
+    private String correctName = "name";
+    private String descriptionMore200Characters = "123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901";
+    private String correctDescription = "correct description";
+    private LocalDate incorrectReleaseDate = LocalDate.of(1894, Month.DECEMBER, 1);
+    private LocalDate correctReleaseDate = LocalDate.now();
+    private Rating correctMpa = new Rating();
+    private Set<Genre> correctGenre = new HashSet<>();
+    private Set<Director> directors = new HashSet<>();
+    private int incorrectDuration = 0;
+    private int correctDuration = 1;
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
     @Test
     public void filmValidation_whenNullName_returnConstraintViolation() {
