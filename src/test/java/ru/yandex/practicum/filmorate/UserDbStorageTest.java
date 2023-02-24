@@ -23,9 +23,14 @@ public class UserDbStorageTest {
 
     private final UserDbStorage userDbStorage;
 
-  /*  @BeforeEach
+    @BeforeEach
     public void beforeEach() {
-        User user = new User(1, "example@gmail.com", "login", LocalDate.now());
+        User user = new User();
+        user.setId(1);
+        user.setName("Max");
+        user.setEmail("example@gmail.com");
+        user.setLogin("login");
+        user.setBirthday(LocalDate.now());
         userDbStorage.create(user);
     }
 
@@ -38,7 +43,12 @@ public class UserDbStorageTest {
 
     @Test
     public void createUserTest() {
-        User user = new User(2, "other@gmail.com", "otherLogin", LocalDate.now());
+        User user = new User();
+        user.setId(2);
+        user.setName("Max");
+        user.setEmail("other@gmail.com");
+        user.setLogin("otherLogin");
+        user.setBirthday(LocalDate.now());
         userDbStorage.create(user);
         Optional<User> userFromDb = userDbStorage.getById(2);
         assertTrue(userFromDb.isPresent());
@@ -47,7 +57,12 @@ public class UserDbStorageTest {
 
     @Test
     public void updateUserTest() {
-        User user = new User(1, "other@gmail.com", "otherLogin", LocalDate.now());
+        User user = new User();
+        user.setId(1);
+        user.setName("Max");
+        user.setEmail("other@gmail.com");
+        user.setLogin("otherLogin");
+        user.setBirthday(LocalDate.now());
         userDbStorage.update(user);
         Optional<User> userFromDb = userDbStorage.getById(1);
         assertTrue(userFromDb.isPresent());
@@ -56,19 +71,29 @@ public class UserDbStorageTest {
 
     @Test
     public void getAllUsersTest() {
-        User user = new User(2, "other@gmail.com", "otherLogin", LocalDate.now());
+        User user = new User();
+        user.setId(2);
+        user.setName("Max");
+        user.setEmail("other@gmail.com");
+        user.setLogin("otherLogin");
+        user.setBirthday(LocalDate.now());
         userDbStorage.create(user);
         assertTrue(userDbStorage.getAll().size() == 2);
     }
 
     @Test
     public void deleteUserTest() {
-        User user = new User(2, "other@gmail.com", "otherLogin", LocalDate.now());
+        User user = new User();
+        user.setId(2);
+        user.setName("Max");
+        user.setEmail("other@gmail.com");
+        user.setLogin("otherLogin");
+        user.setBirthday(LocalDate.now());
         userDbStorage.create(user);
         assertTrue(userDbStorage.getAll().size() == 2);
         userDbStorage.delete(1);
         assertTrue(userDbStorage.getAll().size() == 1);
         userDbStorage.delete(2);
         assertTrue(userDbStorage.getAll().size() == 0);
-    }*/
+    }
 }
