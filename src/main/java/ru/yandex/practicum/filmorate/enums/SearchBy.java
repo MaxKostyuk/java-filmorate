@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.constants;
+package ru.yandex.practicum.filmorate.enums;
 
 public enum SearchBy {
     BOTH,
