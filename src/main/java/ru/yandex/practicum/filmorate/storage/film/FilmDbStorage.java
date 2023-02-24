@@ -67,14 +67,24 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public List<Film> getAll() {
-        String sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID";
-        List<Film> films = jdbcTemplate.query(sql, new FilmMapper());
-        for (Film film : films) {
-            film.setGenres(getGenres(film));
-            film.setLikesFromUsers(getLikes(film));
-            film.setDirectors(getDirectors(film));
-        }
-        return films;
+
+        String sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.rating_id, r.rating_name AS rating, " +
+                "fg.genre_id, g.genre_name AS genre, " +
+                "fd.director_id, d.name AS director " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d " +
+                "ON fd.director_id = d.director_id;";
+
+        return jdbcTemplate.query(sql, new FilmsMapper());
     }
 
     @Override
