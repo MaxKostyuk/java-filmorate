@@ -12,17 +12,17 @@ import java.util.Set;
 
 public class UserValidationTest {
 
-    int correctId = 1;
-    String nullEmail = null;
-    String blankEmail = "";
-    String incorrectEmail = "example.com@";
-    String correctEmail = "example@gmail.com";
-    String blankLogin = "";
-    String loginWithSpaces = "login incorrect";
-    String correctLogin = "login";
-    LocalDate incorrectBirthday = LocalDate.now().plusDays(1);
-    LocalDate correctBirthday = LocalDate.now();
-    Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
+    private int correctId = 1;
+    private String nullEmail = null;
+    private String blankEmail = "";
+    private String incorrectEmail = "example.com@";
+    private String correctEmail = "example@gmail.com";
+    private String blankLogin = "";
+    private String loginWithSpaces = "login incorrect";
+    private String correctLogin = "login";
+    private LocalDate incorrectBirthday = LocalDate.now().plusDays(1);
+    private LocalDate correctBirthday = LocalDate.now();
+    private Validator validator = Validation.buildDefaultValidatorFactory().getValidator();
 
 
     @Test
