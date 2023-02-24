@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class User {
