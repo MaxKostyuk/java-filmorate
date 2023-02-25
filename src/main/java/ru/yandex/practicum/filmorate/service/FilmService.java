@@ -68,7 +68,7 @@ public class FilmService {
     }
 
     public void addLikeToFilm(int filmId, int userId) {
-        User user = userStorage.getById(userId)
+        userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
         Film film = getById(filmId);
         film.getLikesFromUsers().add(userId);
@@ -84,7 +84,7 @@ public class FilmService {
     }
 
     public void deleteLikeOfFilm(int filmId, int userId) {
-        User user = userStorage.getById(userId)
+        userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
         Film film = getById(filmId);
         film.getLikesFromUsers().remove(userId);
