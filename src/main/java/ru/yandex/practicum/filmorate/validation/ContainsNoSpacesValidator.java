@@ -8,4 +8,5 @@ public class ContainsNoSpacesValidator implements ConstraintValidator<ContainsNo
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
         return !s.contains(" ");
     }
+
 }

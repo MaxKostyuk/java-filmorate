@@ -88,4 +88,5 @@ public class FilmController {
                                      @RequestParam(name = "friendId") int friendId) {
         return service.getCommonFilms(userId, friendId);
     }
+
 }

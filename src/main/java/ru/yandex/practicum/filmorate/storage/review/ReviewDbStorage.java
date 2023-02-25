@@ -139,4 +139,5 @@ public class ReviewDbStorage implements ReviewStorage {
             return usefulness != 0 ? usefulness : (o1.getReviewId() - o2.getReviewId());
         }
     }
+
 }

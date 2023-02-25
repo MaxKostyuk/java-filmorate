@@ -59,4 +59,5 @@ public class DirectorController {
         log.info(String.format(LOGGING_DELETE_DIRECTOR_TEMPLATE, id));
         return directorService.delete(id);
     }
+
 }

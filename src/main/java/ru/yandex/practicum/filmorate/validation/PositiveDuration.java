@@ -17,4 +17,5 @@ public @interface PositiveDuration {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
 }

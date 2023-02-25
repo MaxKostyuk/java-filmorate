@@ -9,4 +9,5 @@ public class PositiveDurationValidator implements ConstraintValidator<PositiveDu
     public boolean isValid(Duration duration, ConstraintValidatorContext constraintValidatorContext) {
         return !duration.isNegative();
     }
+
 }

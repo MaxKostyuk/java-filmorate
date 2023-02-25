@@ -77,4 +77,5 @@ public class UserController {
     List<UserEvent> getUserEvents(@PathVariable int id) {
         return service.getUserEvents(id);
     }
+
 }

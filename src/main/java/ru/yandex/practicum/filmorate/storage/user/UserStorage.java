@@ -18,4 +18,5 @@ public interface UserStorage {
     void delete(int id);
 
     List<UserEvent> getUserEvents(int userId);
+
 }

@@ -76,4 +76,5 @@ public class DirectorDbStorage implements DirectorStorage {
     public int delete(int id) {
         return jdbcTemplate.update(SQL_DELETE_DIRECTOR, id);
     }
+
 }

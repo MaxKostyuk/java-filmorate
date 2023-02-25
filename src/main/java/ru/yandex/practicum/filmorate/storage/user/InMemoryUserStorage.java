@@ -48,4 +48,5 @@ public class InMemoryUserStorage implements UserStorage {
     private int getNextId() {
         return ++idCounter;
     }
+
 }

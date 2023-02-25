@@ -28,4 +28,5 @@ public class Review {
     public void setIsPositive(boolean positive) {
         isPositive = positive;
     }
+
 }

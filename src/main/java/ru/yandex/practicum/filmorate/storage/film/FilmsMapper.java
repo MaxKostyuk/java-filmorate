@@ -18,6 +18,7 @@ import java.util.Map;
 public class FilmsMapper implements ResultSetExtractor<List<Film>> {
     @Override
     public List<Film> extractData(ResultSet resultSet) throws SQLException, DataAccessException {
+
         Map<Long, Film> films = new LinkedHashMap<>();
         while (resultSet.next()) {
             Long id = resultSet.getLong("film_id");

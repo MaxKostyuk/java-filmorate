@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 @Primary
-public class    FilmDbStorage implements FilmStorage {
+public class FilmDbStorage implements FilmStorage {
 
     /*
       Константа POWER_OF_RELATIONSHIP определяет максимальное количество наиболее схожих пользователей

@@ -25,4 +25,5 @@ public interface ReviewStorage {
     void addDislike(int reviewId, int userId);
 
     void deleteDislike(int reviewId, int userId);
+
 }

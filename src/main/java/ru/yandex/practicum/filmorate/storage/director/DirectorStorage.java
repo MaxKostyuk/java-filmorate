@@ -14,4 +14,5 @@ public interface DirectorStorage {
     int update(Director director);
 
     int delete(int id);
+
 }

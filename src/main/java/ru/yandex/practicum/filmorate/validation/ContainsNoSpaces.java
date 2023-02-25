@@ -16,4 +16,5 @@ public @interface ContainsNoSpaces {
     Class<?>[] groups() default {};
 
     Class<? extends Payload>[] payload() default {};
+
 }

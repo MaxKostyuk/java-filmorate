@@ -29,4 +29,5 @@ public class RatingController {
     private Rating create(@Valid @RequestBody Rating rating) {
         return service.create(rating);
     }
+
 }

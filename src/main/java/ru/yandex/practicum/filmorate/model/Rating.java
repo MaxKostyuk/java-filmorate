@@ -16,4 +16,6 @@ public class Rating {
     int id;
     @NotBlank
     String name;
+
 }
+

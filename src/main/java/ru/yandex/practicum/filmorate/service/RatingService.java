@@ -31,4 +31,5 @@ public class RatingService {
         log.info("Rating with id {} was added", createdRating.getId());
         return createdRating;
     }
+
 }

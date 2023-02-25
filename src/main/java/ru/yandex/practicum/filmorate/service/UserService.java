@@ -117,6 +117,4 @@ public class UserService {
         getById(userId);
         return userStorage.getUserEvents(userId);
     }
-
-
 }

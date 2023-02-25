@@ -159,4 +159,5 @@ public class UserDbStorage implements UserStorage {
             return rs.getInt("accepter_id");
         }
     }
+
 }

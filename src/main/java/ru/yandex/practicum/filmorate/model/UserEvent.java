@@ -15,4 +15,5 @@ public class UserEvent {
     private final int userId;
     private final int entityId;
     private long timestamp;
+
 }

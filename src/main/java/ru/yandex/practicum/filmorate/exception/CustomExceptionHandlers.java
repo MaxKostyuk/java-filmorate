@@ -41,4 +41,5 @@ public class CustomExceptionHandlers {
     private void otherExceptionHandler(Throwable e) {
         log.warn(e.getMessage());
     }
+
 }

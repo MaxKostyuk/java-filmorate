@@ -30,4 +30,5 @@ public class EventStorage {
     public void getEvent(int id) {
         String sql = "SELECT event_id, user_id, event_type, event_date FROM USER_EVENT WHERE event_id = ?";
     }
+
 }

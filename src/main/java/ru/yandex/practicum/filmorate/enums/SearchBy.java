@@ -4,4 +4,5 @@ public enum SearchBy {
     BOTH,
     DIRECTOR,
     TITLE
+
 }
