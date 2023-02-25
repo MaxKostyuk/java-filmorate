@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
+import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Review;
 
 import java.sql.PreparedStatement;
@@ -78,7 +79,8 @@ public class ReviewDbStorage implements ReviewStorage {
     public Review update(Review review) {
         String sql = "UPDATE review SET content = ?, isPositive = ? WHERE reviewId = ?";
         jdbcTemplate.update(sql, review.getContent(), review.getIsPositive(), review.getReviewId());
-        return getById(review.getReviewId()).get();
+        return getById(review.getReviewId())
+                .orElseThrow(() -> new ElementNotFoundException("Review with id " + review.getReviewId() + " not found", review.getReviewId()));
     }
 
     @Override

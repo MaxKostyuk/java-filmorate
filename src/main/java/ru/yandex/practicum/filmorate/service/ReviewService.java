@@ -40,7 +40,6 @@ public class ReviewService {
 
 
     public Review update(Review review) {
-        validateReviewId(review.getReviewId());
         Review updatedReview = reviewStorage.update(review);
         eventStorage.createEvent(new UserEvent(
                 "REVIEW",
