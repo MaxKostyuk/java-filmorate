@@ -69,4 +69,5 @@ public class GenreDbStorage implements GenreStorage {
             return genre;
         }
     }
+
 }

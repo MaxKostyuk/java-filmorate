@@ -17,4 +17,5 @@ public interface GenreStorage {
     Genre update(Genre genre);
 
     void delete(int id);
+
 }

@@ -4,10 +4,17 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.UserEvent;
+import ru.yandex.practicum.filmorate.storage.event.EventStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
-import java.util.*;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -16,6 +23,8 @@ import java.util.stream.Collectors;
 public class UserService {
 
     private final UserStorage userStorage;
+    private final FilmStorage filmStorage;
+    private final EventStorage eventStorage;
 
     public List<User> getAll() {
         return userStorage.getAll();
@@ -61,6 +70,12 @@ public class UserService {
         User user2 = getById(friendId);
         user1.getFriendsList().add(friendId);
         userStorage.update(user1);
+        eventStorage.createEvent(new UserEvent(
+                "FRIEND",
+                "ADD",
+                id,
+                friendId
+        ));
         log.info("User with id {} was updated", id);
     }
 
@@ -69,6 +84,12 @@ public class UserService {
         User user2 = getById(friendId);
         user1.getFriendsList().remove(friendId);
         userStorage.update(user1);
+        eventStorage.createEvent(new UserEvent(
+                "FRIEND",
+                "REMOVE",
+                id,
+                friendId
+        ));
         log.info("User with id {} was updated", id);
     }
 
@@ -80,5 +101,20 @@ public class UserService {
     private void validateName(User user) {
         if (user.getName() == null | user.getName().isBlank())
             user.setName(user.getLogin());
+    }
+
+    //Метод возвращает рекомендованные к просмотру фильмы
+    public List<Film> getRecommendations(int userId) {
+        return ((FilmDbStorage) filmStorage).getRecommendations(userId);
+    }
+
+    //Метод удаления пользователя по его id
+    public void deleteById(int id) {
+        userStorage.delete(id);
+    }
+
+    public List<UserEvent> getUserEvents(int userId) {
+        getById(userId);
+        return userStorage.getUserEvents(userId);
     }
 }

@@ -31,4 +31,5 @@ public class GenreService {
         log.info("Genre with id {} was added", createdGenre.getId());
         return createdGenre;
     }
+
 }

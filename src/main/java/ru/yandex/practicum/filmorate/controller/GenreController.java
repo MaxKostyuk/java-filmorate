@@ -30,4 +30,5 @@ public class GenreController {
     private Genre create(@Valid @RequestBody Genre genre) {
         return service.create(genre);
     }
+
 }
