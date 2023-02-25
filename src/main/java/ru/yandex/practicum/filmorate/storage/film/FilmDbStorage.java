@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Repository
 @RequiredArgsConstructor
 @Primary
-public class FilmDbStorage implements FilmStorage {
+public class    FilmDbStorage implements FilmStorage {
 
     /*
       Константа POWER_OF_RELATIONSHIP определяет максимальное количество наиболее схожих пользователей
@@ -321,41 +321,72 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> searchFilms(String query, SearchBy type) {
         String sql;
-        List<Film> result = new ArrayList<>();
         switch (type) {
             case BOTH:
-                sql = "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID," +
-                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                        "f.rating_id, r.rating_name AS rating, " +
+                        "fg.genre_id, g.genre_name AS genre, " +
+                        "fd.director_id, d.name AS director " +
+                        "FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
                         "JOIN film_directors AS fd ON f.film_id = fd.film_id " +
                         "JOIN director AS d ON fd.director_id = d.director_id " +
+                        "LEFT JOIN film_genres fg " +
+                        "ON f.film_id = fg.film_id " +
+                        "LEFT JOIN genre AS g " +
+                        "ON fg.genre_id = g.genre_id " +
                         "WHERE (d.name ILIKE '%"+query+"%') " +
                         "UNION " +
-                        "SELECT f.FILM_ID, f.NAME, f.DESCRIPTION, f.RELEASEDATE, f.DURATION, f.RATING_ID, r.RATING_ID, " +
-                        "r.RATING_NAME  FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                        "f.rating_id, r.rating_name AS rating, " +
+                        "fg.genre_id, g.genre_name AS genre, " +
+                        "fd.director_id, d.name AS director " +
+                        "FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "LEFT JOIN film_genres fg " +
+                        "ON f.film_id = fg.film_id " +
+                        "LEFT JOIN genre AS g " +
+                        "ON fg.genre_id = g.genre_id " +
+                        "LEFT JOIN film_directors AS fd " +
+                        "ON f.film_id = fd.film_id " +
+                        "LEFT JOIN director AS d " +
+                        "ON fd.director_id = d.director_id " +
                         "WHERE (f.name ILIKE '%"+query+"%') " +
                         "ORDER BY FILM_ID DESC;";
-                result = jdbcTemplate.query(sql, new FilmMapper());
-                System.out.println(result);
-                break;
+                return jdbcTemplate.query(sql, new FilmsMapper());
+            //System.out.println(result);
+            //break;
             case TITLE:
-                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id WHERE name ILIKE '%"+query+"%'";
-                result = jdbcTemplate.query(sql, new FilmMapper());
-                break;
+                sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                        "f.rating_id, r.rating_name AS rating, " +
+                        "fg.genre_id, g.genre_name AS genre, " +
+                        "fd.director_id, d.name AS director " +
+                        "FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "LEFT JOIN film_genres fg " +
+                        "ON f.film_id = fg.film_id " +
+                        "LEFT JOIN genre AS g " +
+                        "ON fg.genre_id = g.genre_id " +
+                        "LEFT JOIN film_directors AS fd " +
+                        "ON f.film_id = fd.film_id " +
+                        "LEFT JOIN director AS d " +
+                        "ON fd.director_id = d.director_id " +
+                        "WHERE (f.name ILIKE '%"+query+"%') " +
+                        "ORDER BY FILM_ID DESC;";;
+                return jdbcTemplate.query(sql, new FilmsMapper());
             case DIRECTOR:
-                sql = "SELECT * FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
-                        "JOIN film_directors AS fd ON F.film_id = fd.film_id " +
-                        "JOIN director AS d ON d.director_id = fd.director_id " +
-                        "WHERE d.name ILIKE '%"+query+"%'";
-                result = jdbcTemplate.query(sql, new FilmMapper());
-                break;
+                sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                        "f.rating_id, r.rating_name AS rating, " +
+                        "fg.genre_id, g.genre_name AS genre, " +
+                        "fd.director_id, d.name AS director " +
+                        "FROM film AS f JOIN rating AS r ON f.rating_id = r.rating_id " +
+                        "JOIN film_directors AS fd ON f.film_id = fd.film_id " +
+                        "JOIN director AS d ON fd.director_id = d.director_id " +
+                        "LEFT JOIN film_genres fg " +
+                        "ON f.film_id = fg.film_id " +
+                        "LEFT JOIN genre AS g " +
+                        "ON fg.genre_id = g.genre_id " +
+                        "WHERE (d.name ILIKE '%"+query+"%');";
+                return jdbcTemplate.query(sql, new FilmsMapper());
         }
-        for (Film film : result) {
-            film.setGenres(getGenres(film));
-            film.setLikesFromUsers(getLikes(film));
-            film.setDirectors(getDirectors(film));
-        }
-        System.out.println(result);
-        return result;
+        return new ArrayList<>();
     }
 
     //Метод формирует список фильмов рекомендованных к просмотру для пользователя с id указанным в userId
