@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserEvent;
 
 import java.util.*;
 
@@ -38,11 +37,6 @@ public class InMemoryUserStorage implements UserStorage {
     @Override
     public void delete(int id) {
         userMap.remove(id);
-    }
-
-    @Override
-    public List<UserEvent> getUserEvents(int userId) {
-        return null;
     }
 
     private int getNextId() {
