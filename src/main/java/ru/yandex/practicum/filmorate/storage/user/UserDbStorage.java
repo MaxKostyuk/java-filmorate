@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
@@ -9,11 +10,11 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserEvent;
 
 import java.sql.Date;
-import java.sql.*;
-import java.time.LocalDateTime;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -43,7 +44,7 @@ public class UserDbStorage implements UserStorage {
     @Override
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM user_list ORDER BY USER_ID", new UserMapper());
-        for (User user : users) {
+        for(User user : users) {
             user.setFriendsList(getFriends(user));
         }
         return users;
@@ -72,23 +73,6 @@ public class UserDbStorage implements UserStorage {
         jdbcTemplate.update("DELETE FROM USER_LIST WHERE USER_ID = ?", id);
     }
 
-    @Override
-    public List<UserEvent> getUserEvents(int userId) {
-        String sql = "select * FROM USER_EVENTS as u " +
-        "WHERE u.USER_ID = ?  " +
-                "ORDER BY EVENT_ID;";
-        return jdbcTemplate.query(sql, new Object[]{userId}, (rs, rowNum) ->
-                new UserEvent(
-                        rs.getInt("event_id"),
-                        rs.getString("event_type"),
-                        rs.getString("operation"),
-                        rs.getInt("user_id"),
-                        rs.getInt("entity_id"),
-                        rs.getTimestamp("timestamp").getTime()
-                )
-        );
-    }
-
     private Set<Integer> getFriends(User user) {
         String sqlFriends = "SELECT accepter_id FROM friends_list WHERE sender_id = ?";
         return jdbcTemplate.query(sqlFriends, new FriendsMapper(), user.getId())
@@ -103,7 +87,7 @@ public class UserDbStorage implements UserStorage {
         Set<Integer> friendsToDelete = new HashSet<>(oldFriendsList);
         friendsToDelete.removeAll(newFriendsList);
         ArrayList<Integer> friendsToDeleteAsList = new ArrayList<>(friendsToDelete);
-        if (!friendsToDeleteAsList.isEmpty()) {
+        if(!friendsToDeleteAsList.isEmpty()) {
             jdbcTemplate.batchUpdate("DELETE FROM FRIENDS_LIST WHERE SENDER_ID = ? AND ACCEPTER_ID = ?", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -118,7 +102,7 @@ public class UserDbStorage implements UserStorage {
             });
         }
         ArrayList<Integer> friendsToAddAsList = new ArrayList<>(friendsToAdd);
-        if (!friendsToAddAsList.isEmpty()) {
+        if(!friendsToAddAsList.isEmpty()) {
             jdbcTemplate.batchUpdate("INSERT INTO FRIENDS_LIST (SENDER_ID, ACCEPTER_ID, STATUS_ID) VALUES (?,?,?)", new BatchPreparedStatementSetter() {
                 @Override
                 public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -151,7 +135,6 @@ public class UserDbStorage implements UserStorage {
             return user;
         }
     }
-
     private class FriendsMapper implements RowMapper<Integer> {
 
         @Override
