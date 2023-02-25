@@ -5,15 +5,14 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Positive;
-
 @Data
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Genre {
-    @Positive
-    int id;
-    @NotBlank
-    String name;
+public class UserEvent {
+    private int eventId;
+    private final String eventType;
+    private final String operation;
+    private final int userId;
+    private final int entityId;
+    private long timestamp;
 }
