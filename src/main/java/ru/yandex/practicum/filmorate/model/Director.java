@@ -9,13 +9,13 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Positive;
 
 @Data
+@Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Rating {
+public class Director {
     @Positive
-    int id;
+    private Integer id;
     @NotBlank
-    String name;
+    private String name;
 
 }
-

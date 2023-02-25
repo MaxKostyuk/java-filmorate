@@ -69,4 +69,5 @@ public class RatingDbStorage implements RatingStorage {
             return rating;
         }
     }
+
 }

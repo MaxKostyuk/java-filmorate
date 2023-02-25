@@ -45,4 +45,5 @@ public class InMemoryGenreStorage implements GenreStorage {
     private int getNextId() {
         return ++idCounter;
     }
+
 }

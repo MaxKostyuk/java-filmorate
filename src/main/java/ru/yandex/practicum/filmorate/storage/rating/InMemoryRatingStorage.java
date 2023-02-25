@@ -45,4 +45,5 @@ public class InMemoryRatingStorage implements RatingStorage {
     private int getNextId() {
         return ++idCounter;
     }
+
 }
