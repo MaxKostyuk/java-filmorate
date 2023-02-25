@@ -2,9 +2,7 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
@@ -59,22 +57,5 @@ public class UserController {
     private void deleteFromFriends(@PathVariable int id,
                                  @PathVariable int friendId) {
         service.deleteFromFriends(id, friendId);
-    }
-
-    //Метод возвращает фильмы рекомендованные для просмотра
-    @GetMapping("/{id}/recommendations")
-    private List<Film> getRecommendations(@PathVariable int id) {
-        return service.getRecommendations(id);
-    }
-
-    //Метод удаляеи пользователя по его id
-    @DeleteMapping("/{id}")
-    private void deleteById(@PathVariable int id) {
-        service.deleteById(id);
-    }
-
-    @GetMapping("/{id}/feed")
-    List<UserEvent> getUserEvents(@PathVariable int id) {
-        return service.getUserEvents(id);
     }
 }
