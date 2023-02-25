@@ -352,8 +352,6 @@ public class FilmDbStorage implements FilmStorage {
                         "WHERE (f.name ILIKE '%"+query+"%') " +
                         "ORDER BY FILM_ID DESC;";
                 return jdbcTemplate.query(sql, new FilmsMapper());
-            //System.out.println(result);
-            //break;
             case TITLE:
                 sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
                         "f.rating_id, r.rating_name AS rating, " +
