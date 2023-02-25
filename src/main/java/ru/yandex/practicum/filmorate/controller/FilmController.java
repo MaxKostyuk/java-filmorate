@@ -79,17 +79,7 @@ public class FilmController {
     public List<Film> getMostPopularByGenreAndYear(@RequestParam(name = "count", defaultValue = "10") @Positive int count,
                                                    @RequestParam(name = "genreId", defaultValue = "-1") int genreId,
                                                    @RequestParam(name = "year", defaultValue = "-1") int year) {
-
-        //if (genreId > 0 && year > YEAR_OF_FIRST_FILM) {
             return service.getMostPopularByGenreAndYear(count, genreId, year);
-        //} else if (genreId > 0 && year == -1) {
-        //    return service.getMostPopularByGenreAndYear(count, genreId.get(), -1);
-        //} else if (genreId.isEmpty() && year.isPresent() && year.get() > YEAR_OF_FIRST_FILM) {
-        //    return service.getMostPopularByGenreAndYear(count, -1, year.get());
-        //} else {
-            //авторский метод сохранил как и обсуждали
-        //    return service.getMostPopular(count);
-        //}
     }
 
     //Метод возвращает общие фильмы двух пользователей
