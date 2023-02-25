@@ -58,9 +58,7 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
         film.setId(keyHolder.getKey().intValue());
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update("INSERT INTO FILM_GENRES (FILM_ID, GENRE_ID) VALUES (?, ?)", film.getId(), genre.getId());
-        }
+        saveGenres(film);
         saveDirectors(film);
         return getById(keyHolder.getKey().intValue()).get();
     }
@@ -267,6 +265,17 @@ public class FilmDbStorage implements FilmStorage {
     private void updateDirectors(Film film) {
         deleteDirectors(film);
         saveDirectors(film);
+    }
+
+    private void saveGenres(Film film) {
+        String sqlInsertFilmGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES ";
+        int filmId = film.getId();
+        Set<Genre> genres = Optional.ofNullable(film.getGenres()).orElse(new HashSet<>());
+        if (genres.size() > 0) {
+            List<Integer> genresId = genres.stream().map(Genre::getId).collect(Collectors.toList());
+            String genresString = genresId.stream().map(genreId -> String.format("( %d, %d )", filmId, genreId)).collect(Collectors.joining(", "));
+            jdbcTemplate.update(sqlInsertFilmGenres + genresString);
+        }
     }
 
     private class FilmMapper implements RowMapper<Film> {
