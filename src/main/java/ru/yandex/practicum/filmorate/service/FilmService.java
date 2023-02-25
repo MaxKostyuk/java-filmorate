@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.enums.SearchBy;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
