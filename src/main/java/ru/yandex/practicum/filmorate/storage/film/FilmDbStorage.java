@@ -58,9 +58,7 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
         film.setId(keyHolder.getKey().intValue());
-        for (Genre genre : film.getGenres()) {
-            jdbcTemplate.update("INSERT INTO FILM_GENRES (FILM_ID, GENRE_ID) VALUES (?, ?)", film.getId(), genre.getId());
-        }
+        saveGenres(film);
         saveDirectors(film);
         return getById(keyHolder.getKey().intValue()).get();
     }
@@ -114,14 +112,27 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Optional<Film> getById(int id) {
-        String sql = "SELECT * FROM FILM AS F JOIN RATING AS R ON F.RATING_ID = R.RATING_ID WHERE FILM_ID = ?";
-        Optional<Film>  film = jdbcTemplate.query(sql, new FilmMapper(), id).stream().findFirst();
-        if (film.isPresent()) {
-            film.get().setGenres(getGenres(film.get()));
-            film.get().setLikesFromUsers(getLikes(film.get()));
-            film.get().setDirectors(getDirectors(film.get()));
-        }
-        return film;
+        String sql = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
+                "f.rating_id, r.rating_name AS rating, " +
+                "fg.genre_id, g.genre_name AS genre, " +
+                "fd.director_id, d.name AS director " +
+                "FROM film AS f " +
+                "LEFT JOIN rating AS r " +
+                "ON f.rating_id = r.rating_id " +
+                "LEFT JOIN film_genres fg " +
+                "ON f.film_id = fg.film_id " +
+                "LEFT JOIN genre AS g " +
+                "ON fg.genre_id = g.genre_id " +
+                "LEFT JOIN film_directors AS fd " +
+                "ON f.film_id = fd.film_id " +
+                "LEFT JOIN director AS d " +
+                "ON fd.director_id = d.director_id " +
+                "WHERE f.film_id = ?";
+
+        Optional<Film> createdFilm = jdbcTemplate.query(sql, new FilmsMapper(), id).stream().findFirst();
+        if (createdFilm.isPresent())
+            createdFilm.get().setLikesFromUsers(getLikes(createdFilm.get()));
+        return createdFilm;
     }
 
     @Override
@@ -155,7 +166,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateGenres(Film film) {
-        Set<Genre> newGenresList = film.getGenres();
+        Set<Genre> newGenresList = Optional.ofNullable(film.getGenres()).orElse(new HashSet<>());
         Set<Genre> oldGenresList = getGenres(film);
         Set<Genre> genresToAdd = new HashSet<>(newGenresList);
         genresToAdd.removeAll(oldGenresList);
@@ -196,7 +207,7 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void updateLikes(Film film) {
-        Set<Integer> newLikesList = film.getLikesFromUsers();
+        Set<Integer> newLikesList = Optional.ofNullable(film.getLikesFromUsers()).orElse(new HashSet<>());
         Set<Integer> oldLikesList = getLikes(film);
         Set<Integer> likesToAdd = new HashSet<>(newLikesList);
         likesToAdd.removeAll(oldLikesList);
@@ -254,6 +265,17 @@ public class FilmDbStorage implements FilmStorage {
     private void updateDirectors(Film film) {
         deleteDirectors(film);
         saveDirectors(film);
+    }
+
+    private void saveGenres(Film film) {
+        String sqlInsertFilmGenres = "INSERT INTO film_genres (film_id, genre_id) VALUES ";
+        int filmId = film.getId();
+        Set<Genre> genres = Optional.ofNullable(film.getGenres()).orElse(new HashSet<>());
+        if (genres.size() > 0) {
+            List<Integer> genresId = genres.stream().map(Genre::getId).collect(Collectors.toList());
+            String genresString = genresId.stream().map(genreId -> String.format("( %d, %d )", filmId, genreId)).collect(Collectors.joining(", "));
+            jdbcTemplate.update(sqlInsertFilmGenres + genresString);
+        }
     }
 
     private class FilmMapper implements RowMapper<Film> {
@@ -509,7 +531,7 @@ public class FilmDbStorage implements FilmStorage {
         String sqlCommonFilms = "SELECT f.film_id, f.name, f.description, f.releaseDate, f.duration, " +
                 "f.rating_id, r.rating_name as rating, " +
                 "fg.genre_id, g.genre_name as genre, " +
-                "fd.director_id, d.name as director, " +
+                "fd.director_id, d.name as director " +
                 "FROM film AS f " +
                 "LEFT JOIN rating AS r " +
                 "ON f.rating_id = r.rating_id " +

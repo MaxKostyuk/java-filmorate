@@ -8,7 +8,6 @@ import ru.yandex.practicum.filmorate.enums.SearchBy;
 import ru.yandex.practicum.filmorate.exception.ElementNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.model.UserEvent;
 import ru.yandex.practicum.filmorate.storage.director.DirectorStorage;
 import ru.yandex.practicum.filmorate.storage.event.EventStorage;
@@ -68,7 +67,7 @@ public class FilmService {
     }
 
     public void addLikeToFilm(int filmId, int userId) {
-        User user = userStorage.getById(userId)
+        userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
         Film film = getById(filmId);
         film.getLikesFromUsers().add(userId);
@@ -84,7 +83,7 @@ public class FilmService {
     }
 
     public void deleteLikeOfFilm(int filmId, int userId) {
-        User user = userStorage.getById(userId)
+        userStorage.getById(userId)
                 .orElseThrow(() -> new ElementNotFoundException("User with filmId " + filmId + " not found", filmId));
         Film film = getById(filmId);
         film.getLikesFromUsers().remove(userId);
